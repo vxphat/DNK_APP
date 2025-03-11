@@ -1,4 +1,4 @@
-import { View, Platform, StyleSheet } from "react-native";
+import { View, Platform, StyleSheet, Image } from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
 import { Text, PlatformPressable } from "@react-navigation/elements";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -55,6 +55,11 @@ export function MyTabBar({
             onLongPress={onLongPress}
             style={styles.tabbarItem}
           >
+            <Image
+              source={require("../assets/icon/icons8-email-50.png")}
+              style={{ width: 25, height: 25 }}
+              resizeMode="contain"
+            />
             <Text style={{ color: isFocused ? "#05D781" : colors.text }}>
               {label}
             </Text>
@@ -88,6 +93,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 5,
-    marginBottom: 20,
+    marginBottom: 10,
   },
 });

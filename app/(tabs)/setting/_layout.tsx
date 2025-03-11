@@ -8,8 +8,12 @@ export default function SettingLayout() {
         options={{ title: "Cài Đặt", headerShown: false }}
       />
       <Stack.Screen
-        name="doi-mat-khau"
+        name="changePassword"
         options={{ title: "Đổi Mật Khẩu", headerShown: false }}
+      />
+      <Stack.Screen
+        name="language"
+        options={{ title: "Ngôn Ngữ", headerShown: false }}
       />
     </Stack>
   );
