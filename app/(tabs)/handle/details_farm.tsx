@@ -7,13 +7,30 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useState, useRef } from "react";
 
-export default function DetailsSlotScreen() {
+export default function DetailsFarmScreen() {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false); // Trạng thái mở/đóng
+  const animation = useRef(new Animated.Value(0)).current; // Giá trị animation
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+    Animated.timing(animation, {
+      toValue: isOpen ? 0 : 1, // 0 là đóng, 1 là mở
+      duration: 300, // Thời gian hiệu ứng
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const height = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 80], // Độ cao tối thiểu và tối đa của menu
+  });
   return (
     <SafeAreaView>
       <LinearGradient
@@ -48,7 +65,7 @@ export default function DetailsSlotScreen() {
           }}
         >
           <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Thông tin lô hàng
+            Thông tin vườn cây
           </Text>
         </View>
       </LinearGradient>
@@ -57,18 +74,19 @@ export default function DetailsSlotScreen() {
           <View style={styles.button_slot}>
             <Text style={styles.text_1}>24461614</Text>
           </View>
+
           <View style={styles.bg}>
             <View style={styles.item}>
               <View style={{ width: "65 %" }}>
-                <Text style={styles.text_2}>Nhà máy sản xuất</Text>
+                <Text style={styles.text_2}>Nông trường</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>XUÂN LẬP</Text>
+                <Text style={styles.text_3}>Nông trường 1</Text>
               </View>
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Ngày sản xuất</Text>
+                <Text style={styles.text_2}>Ngày tiếp nhận mủ</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>11-03-2025</Text>
@@ -76,28 +94,48 @@ export default function DetailsSlotScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Khối lượng bành</Text>
+                <Text style={styles.text_2}>Số xe vận chuyển</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>35 (kg)</Text>
+                <Text style={styles.text_3}>60H-12345</Text>
               </View>
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Khối lượng lô hàng</Text>
+                <Text style={styles.text_2}>Số chuyến</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>5,04 (tons/tấn)</Text>
+                <Text style={styles.text_3}>1</Text>
               </View>
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/(tabs)/handle/details_farm");
-              }}
-            >
+            <View style={styles.item}>
+              <View style={{ width: "55%" }}>
+                <Text style={styles.text_2}>Giống cây</Text>
+              </View>
+              <View style={{ width: "45%", alignItems: "flex-end" }}>
+                <Text style={styles.text_3}>RRIV 124, RRIV 209</Text>
+              </View>
+            </View>
+            <View style={styles.item}>
+              <View style={{ width: "65%" }}>
+                <Text style={styles.text_2}>Loại mủ</Text>
+              </View>
+              <View style={{ width: "35%", alignItems: "flex-end" }}>
+                <Text style={styles.text_3}>Mủ chén</Text>
+              </View>
+            </View>
+            <View style={styles.item}>
+              <View style={{ width: "65%" }}>
+                <Text style={styles.text_2}>Ngày cạo</Text>
+              </View>
+              <View style={{ width: "35%", alignItems: "flex-end" }}>
+                <Text style={styles.text_3}>11-03-2025</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={toggleDropdown}>
               <View style={styles.item}>
                 <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>Nguyên liệu nông trường</Text>
+                  <Text style={styles.text_2}>Lô vườn cây</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
                   <Image
@@ -108,14 +146,21 @@ export default function DetailsSlotScreen() {
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/(tabs)/handle/details_testing");
-              }}
-            >
+            <Animated.View style={[styles.dropdown, { height }]}>
+              {/* Nội dung menu */}
+              <View style={styles.dropdown_1}>
+                <View style={styles.dropdownItem}>
+                  <Text>1.04DN.NT1.09.110</Text>
+                </View>
+                <View style={styles.dropdownItem}>
+                  <Text>1.04DN.NT1.09.110</Text>
+                </View>
+              </View>
+            </Animated.View>
+            <TouchableOpacity onPress={toggleDropdown}>
               <View style={styles.item}>
                 <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>Kết quả kiểm phẩm</Text>
+                  <Text style={styles.text_2}>Bản đồ vườn cây</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
                   <Image
@@ -173,9 +218,9 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOpacity: 0.1,
     width: "100%",
-    height: 320,
+    height: 580,
     alignItems: "center",
-    marginBottom: 300,
+    marginBottom: 100,
   },
   item: {
     flexDirection: "row",
@@ -183,5 +228,22 @@ const styles = StyleSheet.create({
     borderBottomColor: "#EDE9E9",
     borderBottomWidth: 1,
     width: "90%",
+  },
+  dropdownItem: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#05D781",
+    borderRadius: 30,
+  },
+  dropdown: {
+    width: "90%",
+    backgroundColor: "#fff",
+    overflow: "hidden",
+    borderBottomColor: "#EDE9E9",
+    borderBottomWidth: 1,
+  },
+  dropdown_1: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
