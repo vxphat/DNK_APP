@@ -13,6 +13,17 @@ import { LinearGradient } from "expo-linear-gradient";
 
 const Setting = () => {
   const router = useRouter();
+
+  const sendEmail = () => {
+    const url = "mailto:caosudnkc@gmail.com?subject=&body=";
+    Linking.openURL(url);
+  };
+
+  const Call = () => {
+    const url = "tel:+855979295666";
+    Linking.openURL(url);
+  };
+
   return (
     <SafeAreaView>
       <LinearGradient
@@ -63,7 +74,7 @@ const Setting = () => {
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={sendEmail}>
             <View style={styles.item}>
               <View style={{ flex: 1 }}>
                 <Image
@@ -86,7 +97,7 @@ const Setting = () => {
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={Call}>
             <View style={styles.item}>
               <View style={{ flex: 1 }}>
                 <Image

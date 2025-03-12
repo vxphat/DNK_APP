@@ -8,14 +8,18 @@ import {
   SafeAreaView,
   ScrollView,
   Animated,
+  Linking,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState, useRef } from "react";
+import * as Clipboard from "expo-clipboard";
 
 export default function DetailsFarmScreen() {
   const router = useRouter();
   const [dropdownStates, setDropdownStates] = useState([
+    { isOpen: false, animation: new Animated.Value(0) },
     { isOpen: false, animation: new Animated.Value(0) },
     { isOpen: false, animation: new Animated.Value(0) },
     // Thêm các dropdown khác nếu cần
@@ -26,13 +30,13 @@ export default function DetailsFarmScreen() {
     newDropdownStates[index].isOpen = !newDropdownStates[index].isOpen;
     Animated.timing(newDropdownStates[index].animation, {
       toValue: newDropdownStates[index].isOpen ? 1 : 0,
-      duration: 300,
+      duration: 200,
       useNativeDriver: false,
     }).start();
     setDropdownStates(newDropdownStates);
   };
-
-  const renderDropdownContent = (index: number) => {
+  //Hàm render ra thông tin Lô vườn cây
+  const renderSlotDropdownContent = (index: number) => {
     const height = dropdownStates[index].animation.interpolate({
       inputRange: [0, 1],
       outputRange: [0, 80], // Độ cao tối thiểu và tối đa của menu
@@ -48,14 +52,97 @@ export default function DetailsFarmScreen() {
       >
         <View style={styles.dropdown_1}>
           <View style={styles.dropdownItem}>
-            <Text>Nội dung dropdown {index + 1}</Text>
+            <Text>1.04DN.NT1.09.114</Text>
           </View>
           <View style={styles.dropdownItem}>
-            <Text>Nội dung khác {index + 1}</Text>
+            <Text>1.04DN.NT1.09.115</Text>
           </View>
         </View>
       </Animated.View>
     );
+  };
+  //Hàm render ra thông tin Bản đồ vườn cây
+  const renderMapDropdownContent = (index: number) => {
+    const height = dropdownStates[index].animation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 50], // Độ cao tối thiểu và tối đa của menu
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.dropdown,
+          { height },
+          { borderBottomWidth: dropdownStates[1].isOpen ? 1 : 0 },
+        ]}
+      >
+        <View style={styles.dropdown_2}>
+          <View style={{ marginTop: 10 }}>
+            <TouchableOpacity onPress={LinkGIS}>
+              <Text>https://arcg.is/15DXH12</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <TouchableOpacity
+              onPress={() => {
+                Clipboard.setStringAsync("https://arcg.is/15DXH12");
+                Alert.alert("Đã sao chép vào clipboard!");
+              }}
+            >
+              <Image
+                source={require("../../../assets/icon/copy.png")}
+                style={{ width: 15, height: 15 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
+  //Hàm render ra thông tin GeoJson
+  const renderGeoJsonDropdownContent = (index: number) => {
+    const height = dropdownStates[index].animation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 50], // Độ cao tối thiểu và tối đa của menu
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.dropdown,
+          { height },
+          { borderBottomWidth: dropdownStates[2].isOpen ? 1 : 0 },
+        ]}
+      >
+        <View style={styles.dropdown_2}>
+          <View style={{ marginTop: 10 }}>
+            <TouchableOpacity onPress={LinkGIS}>
+              <Text>https://arcg.is/15DXH12</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <TouchableOpacity
+              onPress={() => {
+                Clipboard.setStringAsync("https://arcg.is/15DXH12");
+                Alert.alert("Đã sao chép vào clipboard!");
+              }}
+            >
+              <Image
+                source={require("../../../assets/icon/copy.png")}
+                style={{ width: 15, height: 15 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
+
+  const LinkGIS = () => {
+    const url = "https://arcg.is/15DXH12";
+    Linking.openURL(url);
   };
 
   return (
@@ -160,7 +247,12 @@ export default function DetailsFarmScreen() {
               </View>
             </View>
             <TouchableOpacity onPress={() => toggleDropdown(0)}>
-              <View style={styles.item}>
+              <View
+                style={[
+                  styles.item,
+                  { borderBottomWidth: dropdownStates[0].isOpen ? 0 : 1 },
+                ]}
+              >
                 <View style={{ width: "65%" }}>
                   <Text style={styles.text_2}>Lô vườn cây</Text>
                 </View>
@@ -177,10 +269,15 @@ export default function DetailsFarmScreen() {
                 </View>
               </View>
             </TouchableOpacity>
-            {renderDropdownContent(0)}
+            {renderSlotDropdownContent(0)}
 
             <TouchableOpacity onPress={() => toggleDropdown(1)}>
-              <View style={styles.item}>
+              <View
+                style={[
+                  styles.item,
+                  { borderBottomWidth: dropdownStates[1].isOpen ? 0 : 1 },
+                ]}
+              >
                 <View style={{ width: "65%" }}>
                   <Text style={styles.text_2}>Bản đồ vườn cây</Text>
                 </View>
@@ -197,7 +294,31 @@ export default function DetailsFarmScreen() {
                 </View>
               </View>
             </TouchableOpacity>
-            {renderDropdownContent(1)}
+            {renderMapDropdownContent(1)}
+            <TouchableOpacity onPress={() => toggleDropdown(2)}>
+              <View
+                style={[
+                  styles.item,
+                  { borderBottomWidth: dropdownStates[2].isOpen ? 0 : 1 },
+                ]}
+              >
+                <View style={{ width: "65%" }}>
+                  <Text style={styles.text_2}>GeoJson</Text>
+                </View>
+                <View style={{ width: "35%", alignItems: "flex-end" }}>
+                  <Image
+                    source={
+                      dropdownStates[2].isOpen
+                        ? require("../../../assets/icon/icons8-arrow-down-30.png") // Hiển thị arrow-down khi dropdown mở
+                        : require("../../../assets/icon/icons8-arrow-right-30.png") // Hiển thị arrow-right khi dropdown đóng
+                    }
+                    style={[{ width: 15, height: 15 }]}
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+            {renderGeoJsonDropdownContent(2)}
           </View>
         </View>
       </ScrollView>
@@ -245,7 +366,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOpacity: 0.1,
     width: "100%",
-    height: 580,
+    height: 1000,
     alignItems: "center",
     marginBottom: 100,
   },
@@ -257,7 +378,7 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   dropdownItem: {
-    marginTop: 20,
+    marginTop: 10,
     padding: 10,
     backgroundColor: "#05D781",
     borderRadius: 30,
@@ -271,5 +392,10 @@ const styles = StyleSheet.create({
   dropdown_1: {
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  dropdown_2: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
   },
 });

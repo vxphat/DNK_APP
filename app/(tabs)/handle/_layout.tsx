@@ -19,6 +19,10 @@ export default function HandleLayout() {
         name="details_farm"
         options={{ title: "Thông tin vườn cây", headerShown: false }}
       />
+      <Stack.Screen
+        name="login"
+        options={{ title: "Đăng nhập", headerShown: false }}
+      />
     </Stack>
   );
 }

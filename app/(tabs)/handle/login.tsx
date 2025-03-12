@@ -11,12 +11,12 @@ import {
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function DoiMatKhauScreen() {
+export default function DangNhapScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView>
-      <LinearGradient
+      {/* <LinearGradient
         // Button Linear Gradient
         colors={["#05D781", "#039375"]}
         style={{
@@ -26,32 +26,19 @@ export default function DoiMatKhauScreen() {
           paddingHorizontal: 10,
         }}
       >
-        <View style={{ width: "5%" }}>
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
-            }}
-          >
-            <Image
-              source={require("../../../assets/icon/icons8-back-48.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            width: "90%",
+            width: "100%",
           }}
         >
           <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Đổi Mật Khẩu
+            Đăng Nhập
           </Text>
         </View>
-      </LinearGradient>
+      </LinearGradient> */}
 
       <View style={{ paddingHorizontal: 10 }}>
         <View style={{ alignItems: "center", marginTop: 20 }}>
@@ -63,20 +50,10 @@ export default function DoiMatKhauScreen() {
         </View>
 
         <View style={{ marginTop: 20 }}>
-          <TextInput
-            placeholder="Mật khẩu cũ"
-            secureTextEntry
-            style={styles.input}
-          />
+          <TextInput placeholder="Tên đăng nhập" style={styles.input} />
 
           <TextInput
-            placeholder="Mật khẩu mới"
-            secureTextEntry
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder="Xác nhận mật khẩu"
+            placeholder="Mật khẩu"
             secureTextEntry
             style={styles.input}
           />
@@ -84,10 +61,10 @@ export default function DoiMatKhauScreen() {
           <LinearGradient colors={["#05D781", "#039375"]} style={styles.button}>
             <TouchableOpacity
               onPress={() => {
-                Alert.alert("Mật khẩu đã được thay đổi!");
+                Alert.alert("Đăng nhập thành công!");
               }}
             >
-              <Text style={styles.text}>ĐỔI MẬT KHẨU</Text>
+              <Text style={styles.text}>ĐĂNG NHẬP</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -98,7 +75,7 @@ export default function DoiMatKhauScreen() {
 
 const styles = StyleSheet.create({
   button: {
-    marginBottom: 10,
+    marginTop: 20,
     width: "100%",
     height: 45,
     borderRadius: 50,
@@ -114,7 +91,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 35,
     backgroundColor: "#fff",
-    height: 45,
+    height: 60,
     color: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowRadius: 10,

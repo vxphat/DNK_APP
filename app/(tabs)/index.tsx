@@ -1,20 +1,27 @@
 import { Image, StyleSheet, SafeAreaView, View, Text } from "react-native";
 import PagerView from "react-native-pager-view";
-
+import { LinearGradient } from "expo-linear-gradient";
 const Page = () => {
   return (
     <SafeAreaView style={{ flex: 1, position: "relative" }}>
-      <View
-        style={{
-          height: 60,
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "#05D781",
-          justifyContent: "center",
-        }}
+      <LinearGradient
+        // Button Linear Gradient
+        colors={["#05D781", "#039375"]}
+        style={{ marginBottom: 20 }}
       >
-        <Text>DNK Traceability</Text>
-      </View>
+        <View
+          style={{
+            height: 60,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
+            DNK Treacibility
+          </Text>
+        </View>
+      </LinearGradient>
 
       <View style={styles.container}>
         <PagerView style={styles.container} initialPage={1}>

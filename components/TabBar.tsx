@@ -1,8 +1,28 @@
-import { View, Platform, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Platform,
+  StyleSheet,
+  Image,
+  ImageSourcePropType,
+} from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
 import { Text, PlatformPressable } from "@react-navigation/elements";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+
+// Định nghĩa type cho ICONS
+interface IconMap {
+  [key: string]: ImageSourcePropType;
+}
+
+// Định nghĩa mapping cho các icon
+const ICONS: IconMap = {
+  index: require("../assets/icon/icons8-home-50.png"),
+  handle: require("../assets/icon/icons8-dev-50.png"),
+  history: require("../assets/icon/icons8-history-50.png"),
+  setting: require("../assets/icon/icons8-setting-50.png"),
+  // Thêm các icon khác tương ứng với tên route
+};
 
 export function MyTabBar({
   state,
@@ -24,6 +44,9 @@ export function MyTabBar({
             : route.name;
 
         const isFocused = state.index === index;
+
+        const iconSource =
+          ICONS[route.name] || require("../assets/icon/icons8-email-50.png");
 
         const onPress = () => {
           const event = navigation.emit({
@@ -56,11 +79,11 @@ export function MyTabBar({
             style={styles.tabbarItem}
           >
             <Image
-              source={require("../assets/icon/icons8-email-50.png")}
-              style={{ width: 25, height: 25 }}
+              source={iconSource}
+              style={{ width: 25, height: 25, marginBottom: 10 }}
               resizeMode="contain"
             />
-            <Text style={{ color: isFocused ? "#05D781" : colors.text }}>
+            <Text style={{ color: isFocused ? "#fff" : colors.text }}>
               {label}
             </Text>
           </PlatformPressable>
@@ -72,20 +95,18 @@ export function MyTabBar({
 
 const styles = StyleSheet.create({
   tabbar: {
-    position: "absolute",
-    bottom: 0,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
-    paddingVertical: 30,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    backgroundColor: "#05D781",
+    paddingVertical: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowRadius: 10,
     shadowOpacity: 0.1,
-    width: 430,
+    width: "100%",
   },
   tabbarItem: {
     flex: 1,

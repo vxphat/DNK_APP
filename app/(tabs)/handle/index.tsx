@@ -36,8 +36,8 @@ export default function HandleScreen() {
         <View>
           <TextInput
             placeholder="Nhập ID lô hàng ở đây"
-            secureTextEntry
             style={styles.input}
+            keyboardType="numeric"
           />
         </View>
         <LinearGradient colors={["#05D781", "#039375"]} style={styles.button}>
@@ -47,6 +47,18 @@ export default function HandleScreen() {
             }}
           >
             <Text style={styles.text}>CHECK</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+        <LinearGradient
+          colors={["#05D781", "#039375"]}
+          style={[styles.button, { marginTop: 50 }]}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/(tabs)/handle/login");
+            }}
+          >
+            <Text style={styles.text}>PAGE ĐĂNG NHẬP</Text>
           </TouchableOpacity>
         </LinearGradient>
       </View>
@@ -67,6 +79,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowRadius: 10,
     shadowOpacity: 0.1,
+    fontSize: 16,
   },
   button: {
     width: "100%",
