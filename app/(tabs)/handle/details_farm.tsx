@@ -15,22 +15,49 @@ import React, { useState, useRef } from "react";
 
 export default function DetailsFarmScreen() {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false); // Trạng thái mở/đóng
-  const animation = useRef(new Animated.Value(0)).current; // Giá trị animation
+  const [dropdownStates, setDropdownStates] = useState([
+    { isOpen: false, animation: new Animated.Value(0) },
+    { isOpen: false, animation: new Animated.Value(0) },
+    // Thêm các dropdown khác nếu cần
+  ]);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-    Animated.timing(animation, {
-      toValue: isOpen ? 0 : 1, // 0 là đóng, 1 là mở
-      duration: 300, // Thời gian hiệu ứng
+  const toggleDropdown = (index: number) => {
+    const newDropdownStates = [...dropdownStates];
+    newDropdownStates[index].isOpen = !newDropdownStates[index].isOpen;
+    Animated.timing(newDropdownStates[index].animation, {
+      toValue: newDropdownStates[index].isOpen ? 1 : 0,
+      duration: 300,
       useNativeDriver: false,
     }).start();
+    setDropdownStates(newDropdownStates);
   };
 
-  const height = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 80], // Độ cao tối thiểu và tối đa của menu
-  });
+  const renderDropdownContent = (index: number) => {
+    const height = dropdownStates[index].animation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 80], // Độ cao tối thiểu và tối đa của menu
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.dropdown,
+          { height },
+          { borderBottomWidth: dropdownStates[0].isOpen ? 1 : 0 },
+        ]}
+      >
+        <View style={styles.dropdown_1}>
+          <View style={styles.dropdownItem}>
+            <Text>Nội dung dropdown {index + 1}</Text>
+          </View>
+          <View style={styles.dropdownItem}>
+            <Text>Nội dung khác {index + 1}</Text>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
+
   return (
     <SafeAreaView>
       <LinearGradient
@@ -132,45 +159,45 @@ export default function DetailsFarmScreen() {
                 <Text style={styles.text_3}>11-03-2025</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={toggleDropdown}>
+            <TouchableOpacity onPress={() => toggleDropdown(0)}>
               <View style={styles.item}>
                 <View style={{ width: "65%" }}>
                   <Text style={styles.text_2}>Lô vườn cây</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
                   <Image
-                    source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                    style={{ width: 15, height: 15 }}
+                    source={
+                      dropdownStates[0].isOpen
+                        ? require("../../../assets/icon/icons8-arrow-down-30.png") // Hiển thị arrow-down khi dropdown mở
+                        : require("../../../assets/icon/icons8-arrow-right-30.png") // Hiển thị arrow-right khi dropdown đóng
+                    }
+                    style={[{ width: 15, height: 15 }]}
                     resizeMode="contain"
                   />
                 </View>
               </View>
             </TouchableOpacity>
-            <Animated.View style={[styles.dropdown, { height }]}>
-              {/* Nội dung menu */}
-              <View style={styles.dropdown_1}>
-                <View style={styles.dropdownItem}>
-                  <Text>1.04DN.NT1.09.110</Text>
-                </View>
-                <View style={styles.dropdownItem}>
-                  <Text>1.04DN.NT1.09.110</Text>
-                </View>
-              </View>
-            </Animated.View>
-            <TouchableOpacity onPress={toggleDropdown}>
+            {renderDropdownContent(0)}
+
+            <TouchableOpacity onPress={() => toggleDropdown(1)}>
               <View style={styles.item}>
                 <View style={{ width: "65%" }}>
                   <Text style={styles.text_2}>Bản đồ vườn cây</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
                   <Image
-                    source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                    style={{ width: 15, height: 15 }}
+                    source={
+                      dropdownStates[1].isOpen
+                        ? require("../../../assets/icon/icons8-arrow-down-30.png") // Hiển thị arrow-down khi dropdown mở
+                        : require("../../../assets/icon/icons8-arrow-right-30.png") // Hiển thị arrow-right khi dropdown đóng
+                    }
+                    style={[{ width: 15, height: 15 }]}
                     resizeMode="contain"
                   />
                 </View>
               </View>
             </TouchableOpacity>
+            {renderDropdownContent(1)}
           </View>
         </View>
       </ScrollView>
@@ -240,7 +267,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     overflow: "hidden",
     borderBottomColor: "#EDE9E9",
-    borderBottomWidth: 1,
   },
   dropdown_1: {
     flexDirection: "row",
