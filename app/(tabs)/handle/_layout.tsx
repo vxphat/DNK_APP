@@ -23,6 +23,10 @@ export default function HandleLayout() {
         name="login"
         options={{ title: "Đăng nhập", headerShown: false }}
       />
+      <Stack.Screen
+        name="camera"
+        options={{ title: "Test Camera", headerShown: false }}
+      />
     </Stack>
   );
 }

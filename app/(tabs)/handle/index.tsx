@@ -61,6 +61,18 @@ export default function HandleScreen() {
             <Text style={styles.text}>PAGE ĐĂNG NHẬP</Text>
           </TouchableOpacity>
         </LinearGradient>
+        <LinearGradient
+          colors={["#05D781", "#039375"]}
+          style={[styles.button, { marginTop: 50 }]}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/(tabs)/handle/camera");
+            }}
+          >
+            <Text style={styles.text}>TEST CAMERA</Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
     </SafeAreaView>
   );
