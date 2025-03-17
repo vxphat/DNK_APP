@@ -1,20 +1,10 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  Animated,
-  Linking,
-  Alert,
-} from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Animated, Linking, Alert, } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState, useRef } from "react";
 import * as Clipboard from "expo-clipboard";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MapView from "react-native-maps";
 
 export default function DetailsFarmScreen() {
   const router = useRouter();
@@ -65,7 +55,7 @@ export default function DetailsFarmScreen() {
   const renderMapDropdownContent = (index: number) => {
     const height = dropdownStates[index].animation.interpolate({
       inputRange: [0, 1],
-      outputRange: [0, 50], // Độ cao tối thiểu và tối đa của menu
+      outputRange: [0, 260], // Độ cao tối thiểu và tối đa của menu
     });
 
     return (
@@ -79,7 +69,7 @@ export default function DetailsFarmScreen() {
         <View style={styles.dropdown_2}>
           <View style={{ marginTop: 10 }}>
             <TouchableOpacity onPress={LinkGIS}>
-              <Text>https://arcg.is/15DXH12</Text>
+              <Text>https://arcg.is/15DXH1221312</Text>
             </TouchableOpacity>
           </View>
           <View style={{ marginTop: 10 }}>
@@ -96,6 +86,17 @@ export default function DetailsFarmScreen() {
               />
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={{ height: 200, width: '100%', marginTop:10 }}>
+          <MapView style={styles.map} 
+            
+            initialRegion={{
+              latitude: 10.939421,
+              longitude: 107.186274,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+          />
         </View>
       </Animated.View>
     );
@@ -118,9 +119,10 @@ export default function DetailsFarmScreen() {
         <View style={styles.dropdown_2}>
           <View style={{ marginTop: 10 }}>
             <TouchableOpacity onPress={LinkGIS}>
-              <Text>https://arcg.is/15DXH12</Text>
+              <Text>https://arcg.is/15DXH123333</Text>
             </TouchableOpacity>
           </View>
+
           <View style={{ marginTop: 10 }}>
             <TouchableOpacity
               onPress={() => {
@@ -135,7 +137,9 @@ export default function DetailsFarmScreen() {
               />
             </TouchableOpacity>
           </View>
+
         </View>
+
       </Animated.View>
     );
   };
@@ -146,47 +150,50 @@ export default function DetailsFarmScreen() {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
       <LinearGradient
-        // Button Linear Gradient
         colors={["#05D781", "#039375"]}
-        style={{
-          flexDirection: "row",
-          height: 60,
-          alignItems: "center",
-          paddingHorizontal: 10,
-        }}
       >
-        <View style={{ width: "5%" }}>
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
-            }}
-          >
-            <Image
-              source={require("../../../assets/icon/icons8-back-48.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
         <View
           style={{
-            flexDirection: "row",
+            paddingVertical: 10,
             alignItems: "center",
             justifyContent: "center",
-            width: "90%",
+            flexDirection: "row",
           }}
         >
-          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Thông tin vườn cây
-          </Text>
+          <View style={{ width: "5%" }}>
+            <TouchableOpacity
+              onPress={() => {
+                router.back();
+              }}
+            >
+              <Image
+                source={require("../../../assets/icon/icons8-back-48.png")}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "90%",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
+              Thông tin lô hàng
+            </Text>
+          </View>
         </View>
       </LinearGradient>
-      <ScrollView>
+
+      <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
         <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
           <View style={styles.button_slot}>
-            <Text style={styles.text_1}>24461614</Text>
+            <Text style={styles.text_1}>244616144</Text>
           </View>
 
           <View style={styles.bg}>
@@ -319,9 +326,12 @@ export default function DetailsFarmScreen() {
               </View>
             </TouchableOpacity>
             {renderGeoJsonDropdownContent(2)}
+
           </View>
+
         </View>
       </ScrollView>
+
     </SafeAreaView>
   );
 }
@@ -369,6 +379,10 @@ const styles = StyleSheet.create({
     height: 1000,
     alignItems: "center",
     marginBottom: 100,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
   },
   item: {
     flexDirection: "row",

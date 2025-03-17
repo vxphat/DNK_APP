@@ -11,6 +11,7 @@ const TabLayout = () => {
     >
       <Tabs.Screen name="index" options={{ title: "Trang chủ" }}></Tabs.Screen>
       <Tabs.Screen name="handle" options={{ title: "Nhập tay" }}></Tabs.Screen>
+      <Tabs.Screen name="scan" options={{ title: "Quét Qr" }}></Tabs.Screen>
       <Tabs.Screen name="history" options={{ title: "Lịch sử" }}></Tabs.Screen>
       <Tabs.Screen name="setting" options={{ title: "Cài đặt" }}></Tabs.Screen>
     </Tabs>

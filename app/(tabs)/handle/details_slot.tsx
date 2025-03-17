@@ -1,61 +1,59 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-} from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function DetailsSlotScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
+      {/* Header với LinearGradient */}
+
       <LinearGradient
-        // Button Linear Gradient
         colors={["#05D781", "#039375"]}
-        style={{
-          flexDirection: "row",
-          height: 60,
-          alignItems: "center",
-          paddingHorizontal: 10,
-        }}
       >
-        <View style={{ width: "5%" }}>
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
-            }}
-          >
-            <Image
-              source={require("../../../assets/icon/icons8-back-48.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
         <View
           style={{
-            flexDirection: "row",
+            paddingVertical: 10,
             alignItems: "center",
             justifyContent: "center",
-            width: "90%",
+            flexDirection: "row",
           }}
         >
-          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Thông tin lô hàng
-          </Text>
+          <View style={{ width: "5%" }}>
+            <TouchableOpacity
+              onPress={() => {
+                router.back();
+              }}
+            >
+              <Image
+                source={require("../../../assets/icon/icons8-back-48.png")}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "90%",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
+              Thông tin lô hàng
+            </Text>
+          </View>
         </View>
       </LinearGradient>
-      <ScrollView>
+
+      {/* Nội dung chính */}
+
+      <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
         <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
           <View style={styles.button_slot}>
-            <Text style={styles.text_1}>24461614</Text>
+            <Text style={styles.text_1}>244616142</Text>
           </View>
           <View style={styles.bg}>
             <View style={styles.item}>
@@ -129,7 +127,9 @@ export default function DetailsSlotScreen() {
           </View>
         </View>
       </ScrollView>
+
     </SafeAreaView>
+
   );
 }
 
