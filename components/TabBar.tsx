@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
 import { Text, PlatformPressable } from "@react-navigation/elements";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 // Định nghĩa type cho ICONS
@@ -16,13 +16,15 @@ interface IconMap {
 }
 
 // Định nghĩa mapping cho các icon
-const ICONS: IconMap = {
-  index: require("../assets/icon/icons8-home-50.png"),
-  handle: require("../assets/icon/icons8-dev-50.png"),
-  history: require("../assets/icon/icons8-history-50.png"),
-  setting: require("../assets/icon/icons8-setting-50.png"),
-  // Thêm các icon khác tương ứng với tên route
+const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  index: "home-outline",
+  handle: "code-slash-outline",
+  scan: "scan",
+  history: "timer-outline",
+  setting: "settings-outline",
 };
+
+
 
 export function MyTabBar({
   state,
@@ -32,19 +34,24 @@ export function MyTabBar({
   const { colors } = useTheme();
   const { buildHref } = useLinkBuilder();
 
+  // ✅ Sắp xếp thứ tự tab theo ý muốn
+  const order = ["index", "handle", 'scan', "history", "setting"];
+  const sortedRoutes = state.routes.sort(
+    (a, b) => order.indexOf(a.name) - order.indexOf(b.name)
+  );
+
   return (
     <View style={styles.tabbar}>
-      {state.routes.map((route, index) => {
+      {sortedRoutes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
           options.tabBarLabel !== undefined
             ? options.tabBarLabel
             : options.title !== undefined
-            ? options.title
-            : route.name;
+              ? options.title
+              : route.name;
 
         const isFocused = state.index === index;
-
         const iconSource =
           ICONS[route.name] || require("../assets/icon/icons8-email-50.png");
 
@@ -76,43 +83,65 @@ export function MyTabBar({
             testID={options.tabBarButtonTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={styles.tabbarItem}
+            style={route.name === "scan" ? styles.tabbarScanContainer : styles.tabbarItem}
           >
-            <Image
-              source={iconSource}
-              style={{ width: 25, height: 25, marginBottom: 10 }}
-              resizeMode="contain"
-            />
-            <Text style={{ color: isFocused ? "#fff" : colors.text }}>
-              {label}
-            </Text>
+            {route.name === "scan" ? (
+              <View style={styles.tabbarScan}>
+                <Ionicons
+                  name={ICONS[route.name]}
+                  size={40}
+                  color="#fff"
+                />
+              </View>
+            ) : (
+              <>
+                <Ionicons
+                  name={ICONS[route.name]}
+                  size={25}
+                  color={isFocused ? "#fff" : "#333333"}
+                />
+                <Text style={{ color: isFocused ? "#fff" : "#333333", fontSize: 14, marginTop:5, fontWeight:'500' }}>
+                  {label}
+                </Text>
+              </>
+            )}
           </PlatformPressable>
         );
       })}
     </View>
   );
+
 }
+
 
 const styles = StyleSheet.create({
   tabbar: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#05D781",
-    paddingVertical: 20,
-    // borderTopLeftRadius: 0,
-    // borderTopRightRadius: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 10,
-    shadowOpacity: 0.1,
-    width: "100%",
+    backgroundColor: '#05D781',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   tabbarItem: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center"
+  },
+  tabbarScanContainer: {
+    top: -40,
+    width: 80,
+    height: 80,
+    justifyContent: "center",
     alignItems: "center",
-    gap: 5,
-    marginBottom: 10,
+  },
+  tabbarScan: {
+    width: 90, // Chiều rộng đầy đủ
+    height: 90, // Chiều cao đầy đủ
+    backgroundColor: "#05D781",
+    borderWidth: 5,
+    borderColor: "#f1f4f2",
+    borderRadius: 45, // Hình tròn
+    justifyContent: "center",
+    alignItems: "center",
+    // Để làm phẳng hai bên, chúng ta sẽ dùng một thủ thuật với container bên ngoài
   },
 });

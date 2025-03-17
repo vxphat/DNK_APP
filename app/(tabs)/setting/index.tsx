@@ -1,13 +1,12 @@
 import {
   Image,
   StyleSheet,
-  SafeAreaView,
   View,
   Text,
   TouchableOpacity,
   Linking,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -25,27 +24,32 @@ const Setting = () => {
   };
 
   return (
-    <SafeAreaView>
-      <LinearGradient
-        // Button Linear Gradient
-        colors={["#05D781", "#039375"]}
-        style={{ marginBottom: 20 }}
-      >
-        <View
-          style={{
-            height: 60,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Cài đặt
-          </Text>
-        </View>
-      </LinearGradient>
+    
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
+      {/* Header với LinearGradient */}
+      <View
 
-      <View style={{ paddingHorizontal: 10 }}>
+      >
+        <LinearGradient
+          // Button Linear Gradient
+          colors={["#05D781", "#039375"]}
+        >
+          <View
+            style={{
+              paddingVertical: 10,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
+              Cài đặt
+            </Text>
+          </View>
+        </LinearGradient>
+      </View>
+
+      {/* Nội dung chính */}
+      <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal:10, paddingTop:10 }}>
         <View>
           <TouchableOpacity
             onPress={() => {

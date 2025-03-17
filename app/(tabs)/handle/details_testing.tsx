@@ -55,7 +55,7 @@ export default function DetailsTestingScreen() {
       <ScrollView>
         <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
           <View style={styles.button_slot}>
-            <Text style={styles.text_1}>24461614</Text>
+            <Text style={styles.text_1}>244616141</Text>
           </View>
 
           <View style={styles.bg}>

@@ -26,6 +26,7 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="handle" />
+      <Stack.Screen name="scan" />
       <Stack.Screen name="history" />
       <Stack.Screen name="setting" />
     </Stack>

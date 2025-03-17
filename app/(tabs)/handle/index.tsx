@@ -1,7 +1,6 @@
 import {
   Image,
   StyleSheet,
-  SafeAreaView,
   View,
   Text,
   TouchableOpacity,
@@ -9,33 +8,39 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HandleScreen() {
   const router = useRouter();
   return (
-    <SafeAreaView style={{ flex: 1, position: "relative" }}>
-      <LinearGradient
-        // Button Linear Gradient
-        colors={["#05D781", "#039375"]}
-        style={{ marginBottom: 20 }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
+      {/* Header với LinearGradient */}
+      <View
+
       >
-        <View
-          style={{
-            height: 60,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+        <LinearGradient
+          // Button Linear Gradient
+          colors={["#05D781", "#039375"]}
         >
-          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Nhập ID tay
-          </Text>
-        </View>
-      </LinearGradient>
-      <View style={{ paddingHorizontal: 10 }}>
+          <View
+            style={{
+              paddingVertical: 10,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
+              Nhập mã lô hàng
+            </Text>
+          </View>
+        </LinearGradient>
+      </View>
+
+      {/* Nội dung chính */}
+      <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal:10 }}>
         <View>
           <TextInput
-            placeholder="Nhập ID lô hàng ở đây"
+            placeholder="Nhập mã lô hàng ở đây"
             style={styles.input}
             keyboardType="numeric"
           />
@@ -49,34 +54,11 @@ export default function HandleScreen() {
             <Text style={styles.text}>CHECK</Text>
           </TouchableOpacity>
         </LinearGradient>
-        <LinearGradient
-          colors={["#05D781", "#039375"]}
-          style={[styles.button, { marginTop: 50 }]}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              router.push("/(tabs)/handle/login");
-            }}
-          >
-            <Text style={styles.text}>PAGE ĐĂNG NHẬP</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-        <LinearGradient
-          colors={["#05D781", "#039375"]}
-          style={[styles.button, { marginTop: 50 }]}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              router.push("/(tabs)/handle/camera");
-            }}
-          >
-            <Text style={styles.text}>TEST CAMERA</Text>
-          </TouchableOpacity>
-        </LinearGradient>
       </View>
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   input: {
