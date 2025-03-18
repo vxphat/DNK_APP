@@ -1,58 +1,69 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, } from "react-native"
+import { useRouter } from "expo-router"
+import { LinearGradient } from "expo-linear-gradient"
+import { SafeAreaView } from "react-native-safe-area-context"
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useDispatch, useSelector } from "react-redux"
+import { changeLanguage } from "../../../store/slice/langSlice"
+import { RootState } from "../../../store"
+import React, { useState, useEffect } from 'react'
+import { useTranslation } from "react-i18next"
+
+
 
 export default function languageScreen() {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const language = useSelector((state: RootState) => state.lang.language);
+  const { t, i18n } = useTranslation();
+
+  const langeArray = [
+    { id: 'vi', language: 'Vietnamese' },
+    { id: 'en', language: 'English' }
+  ]
 
   return (
-    <SafeAreaView style={{}}>
-      <LinearGradient
-        // Button Linear Gradient
-        colors={["#05D781", "#039375"]}
-        style={{
-          flexDirection: "row",
-          height: 60,
-          alignItems: "center",
-          paddingHorizontal: 10,
-        }}
-      >
-        <View style={{ width: "5%" }}>
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
+      <View>
+        <LinearGradient colors={["#05D781", "#039375"]}>
+          <View
+            style={{
+              paddingVertical: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
             }}
           >
-            <Image
-              source={require("../../../assets/icon/icons8-back-48.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "90%",
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Ngôn Ngữ
-          </Text>
-        </View>
-      </LinearGradient>
+            <View style={{ width: "5%" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  router.back();
+                }}
+              >
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={28}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "90%",
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
+                {t('language')}
+              </Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </View>
 
-      <View style={{ paddingHorizontal: 10 }}>
+      <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10, paddingTop: 10 }}>
         <View style={{ alignItems: "center" }}>
           <View style={styles.button_language}>
             <Image
@@ -60,38 +71,35 @@ export default function languageScreen() {
               style={{ width: 30, height: 30 }}
               resizeMode="contain"
             />
-            <Text style={styles.text}>Chọn ngôn ngữ</Text>
+            <Text style={styles.text}>{t('selectLanguage')}</Text>
           </View>
           <View style={{ marginTop: 20 }}>
-            <TouchableOpacity>
-              <View style={styles.item}>
-                <View>
-                  <Text style={styles.color}>Vietnamese</Text>
+            {langeArray.map((item, key) => (
+              <TouchableOpacity key={key}
+                onPress={() => {
+                  i18n.changeLanguage(item.id)
+                  dispatch(changeLanguage({ language: item.id }));
+                }}
+              >
+                <View style={styles.item}>
+                  <View>
+                    <Text style={styles.color}>{item.language}</Text>
+                  </View>
+                  <View>
+                    {item.id === language && (
+                      <Ionicons
+                        name="checkmark-sharp"
+                        size={20}
+                        color="#039375"
+                      />
+                    )}
+                  </View>
                 </View>
-                <View>
-                  <Image
-                    source={require("../../../assets/icon/icons8-check-48.png")}
-                    style={{ width: 15, height: 15 }}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
 
-            <TouchableOpacity>
-              <View style={styles.item}>
-                <View>
-                  <Text style={styles.color}>English</Text>
-                </View>
-                <View>
-                  <Image
-                  // source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                  // style={{ width: 15, height: 15 }}
-                  // resizeMode="contain"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
+
+
           </View>
         </View>
       </View>

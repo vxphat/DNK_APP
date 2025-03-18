@@ -1,14 +1,13 @@
 import {
   View,
-  Platform,
   StyleSheet,
-  Image,
   ImageSourcePropType,
 } from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
 import { Text, PlatformPressable } from "@react-navigation/elements";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+
 
 // Định nghĩa type cho ICONS
 interface IconMap {
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
   tabbarScan: {
     width: 90, // Chiều rộng đầy đủ
     height: 90, // Chiều cao đầy đủ
-    backgroundColor: "#05D781",
+    backgroundColor: "#039375",
     borderWidth: 5,
     borderColor: "#f1f4f2",
     borderRadius: 45, // Hình tròn

@@ -1,59 +1,56 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, } from "react-native"
+import { useRouter } from "expo-router"
+import { LinearGradient } from "expo-linear-gradient"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { useTranslation } from "react-i18next"
+import Ionicons from '@expo/vector-icons/Ionicons'
 
 export default function DoiMatKhauScreen() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
 
   return (
-    <SafeAreaView>
-      <LinearGradient
-        // Button Linear Gradient
-        colors={["#05D781", "#039375"]}
-        style={{
-          flexDirection: "row",
-          height: 60,
-          alignItems: "center",
-          paddingHorizontal: 10,
-        }}
-      >
-        <View style={{ width: "5%" }}>
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
+      <View>
+        <LinearGradient colors={["#05D781", "#039375"]}>
+          <View
+            style={{
+              paddingVertical: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
             }}
           >
-            <Image
-              source={require("../../../assets/icon/icons8-back-48.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "90%",
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: 600, fontSize: 16 }}>
-            Đổi Mật Khẩu
-          </Text>
-        </View>
-      </LinearGradient>
+            <View style={{ width: "5%" }}>
+              <TouchableOpacity
+                onPress={() => {
+                  router.back();
+                }}
+              >
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={28}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "90%",
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
+                {t('changePassword')}
+              </Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </View>
 
-      <View style={{ paddingHorizontal: 10 }}>
+      <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10, paddingTop: 10 }}>
         <View style={{ alignItems: "center", marginTop: 20 }}>
           <Image
             source={require("../../../assets/images/Logo_DNKC_RGB.png")}
@@ -64,19 +61,19 @@ export default function DoiMatKhauScreen() {
 
         <View style={{ marginTop: 20 }}>
           <TextInput
-            placeholder="Mật khẩu cũ"
+            placeholder={t('oldPassword')}
             secureTextEntry
             style={styles.input}
           />
 
           <TextInput
-            placeholder="Mật khẩu mới"
+            placeholder={t('newPassword')}
             secureTextEntry
             style={styles.input}
           />
 
           <TextInput
-            placeholder="Xác nhận mật khẩu"
+            placeholder={t('confirmPassword')}
             secureTextEntry
             style={styles.input}
           />
@@ -87,7 +84,7 @@ export default function DoiMatKhauScreen() {
                 Alert.alert("Mật khẩu đã được thay đổi!");
               }}
             >
-              <Text style={styles.text}>ĐỔI MẬT KHẨU</Text>
+              <Text style={styles.text}>{t('changePassword')}</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -126,5 +123,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontWeight: 700,
+    textTransform: "uppercase"
   },
 });

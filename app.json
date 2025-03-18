@@ -43,7 +43,9 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-localization",
+      "expo-barcode-scanner"
     ],
     "experiments": {
       "typedRoutes": true

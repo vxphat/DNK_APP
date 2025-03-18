@@ -1,13 +1,16 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Animated, Linking, Alert, } from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useState, useRef } from "react";
-import * as Clipboard from "expo-clipboard";
-import { SafeAreaView } from "react-native-safe-area-context";
-import MapView from "react-native-maps";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Animated, Linking, Alert, } from "react-native"
+import { useRouter } from "expo-router"
+import { LinearGradient } from "expo-linear-gradient"
+import React, { useState, useRef } from "react"
+import * as Clipboard from "expo-clipboard"
+import { SafeAreaView } from "react-native-safe-area-context"
+import MapView from "react-native-maps"
+import { useTranslation } from "react-i18next"
+import Ionicons from '@expo/vector-icons/Ionicons'
 
 export default function DetailsFarmScreen() {
   const router = useRouter();
+  const { t } = useTranslation()
   const [dropdownStates, setDropdownStates] = useState([
     { isOpen: false, animation: new Animated.Value(0) },
     { isOpen: false, animation: new Animated.Value(0) },
@@ -168,10 +171,10 @@ export default function DetailsFarmScreen() {
                 router.back();
               }}
             >
-              <Image
-                source={require("../../../assets/icon/icons8-back-48.png")}
-                style={{ width: 20, height: 20 }}
-                resizeMode="contain"
+              <Ionicons
+                name="chevron-back-outline"
+                size={28}
+                color="#fff"
               />
             </TouchableOpacity>
           </View>
@@ -184,7 +187,7 @@ export default function DetailsFarmScreen() {
             }}
           >
             <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
-              Thông tin lô hàng
+            {t('batchInformation')}
             </Text>
           </View>
         </View>
@@ -199,7 +202,7 @@ export default function DetailsFarmScreen() {
           <View style={styles.bg}>
             <View style={styles.item}>
               <View style={{ width: "65 %" }}>
-                <Text style={styles.text_2}>Nông trường</Text>
+                <Text style={styles.text_2}>{t('farm')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>Nông trường 1</Text>
@@ -207,7 +210,7 @@ export default function DetailsFarmScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Ngày tiếp nhận mủ</Text>
+                <Text style={styles.text_2}>{t('rubberReceivingDate')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>11-03-2025</Text>
@@ -215,7 +218,7 @@ export default function DetailsFarmScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Số xe vận chuyển</Text>
+                <Text style={styles.text_2}>{t('truckNumber')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>60H-12345</Text>
@@ -223,7 +226,7 @@ export default function DetailsFarmScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Số chuyến</Text>
+                <Text style={styles.text_2}>{t('tripNumber')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>1</Text>
@@ -231,7 +234,7 @@ export default function DetailsFarmScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "55%" }}>
-                <Text style={styles.text_2}>Giống cây</Text>
+                <Text style={styles.text_2}>{t('plantVariety')}</Text>
               </View>
               <View style={{ width: "45%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>RRIV 124, RRIV 209</Text>
@@ -239,7 +242,7 @@ export default function DetailsFarmScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Loại mủ</Text>
+                <Text style={styles.text_2}>{t('rubberType')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>Mủ chén</Text>
@@ -247,7 +250,7 @@ export default function DetailsFarmScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Ngày cạo</Text>
+                <Text style={styles.text_2}>{t('tappingDate')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>11-03-2025</Text>
@@ -261,7 +264,7 @@ export default function DetailsFarmScreen() {
                 ]}
               >
                 <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>Lô vườn cây</Text>
+                  <Text style={styles.text_2}>{t('treePlot')}</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
                   <Image
@@ -286,7 +289,7 @@ export default function DetailsFarmScreen() {
                 ]}
               >
                 <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>Bản đồ vườn cây</Text>
+                  <Text style={styles.text_2}>{t('plantationMap')}</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
                   <Image
