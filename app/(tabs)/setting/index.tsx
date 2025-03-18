@@ -1,17 +1,23 @@
-import {
-  Image,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Linking,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet, View, Text, TouchableOpacity, Linking, Alert } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { useRouter } from "expo-router"
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { LinearGradient } from "expo-linear-gradient"
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { useSelector } from "react-redux"
+import { RootState } from "../../../store"
+import React, { useState, useEffect } from 'react'
+import { useTranslation } from "react-i18next"
 
 const Setting = () => {
   const router = useRouter();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const { t } = useTranslation();
+
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   const sendEmail = () => {
     const url = "mailto:caosudnkc@gmail.com?subject=&body=";
@@ -23,13 +29,36 @@ const Setting = () => {
     Linking.openURL(url);
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(t('notification'), t('areYouSureYouWantToDeleteYourAccount'), [
+      {
+        text: t('cancel'),
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      { text: t('ok'), onPress: () => console.log('OK Pressed') },
+    ]);
+  }
+
+  const handleLogout = () => {
+    Alert.alert(t('notification'), t('areYouSureYouWanttoLogOutOfYourAccount'), [
+      {
+        text: t('cancel'),
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      { text: t('ok'), onPress: () => {
+        router.push("../../login");
+      } },
+    ]);
+  }
+
+
   return (
-    
+
     <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
       {/* Header với LinearGradient */}
-      <View
-
-      >
+      <View>
         <LinearGradient
           // Button Linear Gradient
           colors={["#05D781", "#039375"]}
@@ -42,14 +71,14 @@ const Setting = () => {
             }}
           >
             <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
-              Cài đặt
+              {t('setting')}
             </Text>
           </View>
         </LinearGradient>
       </View>
 
       {/* Nội dung chính */}
-      <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal:10, paddingTop:10 }}>
+      <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10, paddingTop: 10 }}>
         <View>
           <TouchableOpacity
             onPress={() => {
@@ -58,20 +87,20 @@ const Setting = () => {
           >
             <View style={styles.item}>
               <View style={{ flex: 1 }}>
-                <Image
-                  source={require("../../../assets/icon/icons8-key-48.png")}
-                  style={{ width: 25, height: 25 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="key-outline"
+                  size={25}
+                  color="#039375"
                 />
               </View>
               <View style={{ flex: 6 }}>
-                <Text style={styles.color}>Đổi mật khẩu</Text>
+                <Text style={styles.color}>{t('changePassword')}</Text>
               </View>
               <View>
-                <Image
-                  source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                  style={{ width: 15, height: 15 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#333333"
                 />
               </View>
             </View>
@@ -81,20 +110,20 @@ const Setting = () => {
           <TouchableOpacity onPress={sendEmail}>
             <View style={styles.item}>
               <View style={{ flex: 1 }}>
-                <Image
-                  source={require("../../../assets/icon/icons8-email-50.png")}
-                  style={{ width: 25, height: 25 }}
-                  resizeMode="contain"
+                <MaterialCommunityIcons
+                  name="email-fast-outline"
+                  size={25}
+                  color="#039375"
                 />
               </View>
               <View style={{ flex: 6 }}>
-                <Text style={styles.color}>Hỗ trợ qua Email</Text>
+                <Text style={styles.color}>{t('supportViaEmail')}</Text>
               </View>
               <View>
-                <Image
-                  source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                  style={{ width: 15, height: 15 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#333333"
                 />
               </View>
             </View>
@@ -104,20 +133,20 @@ const Setting = () => {
           <TouchableOpacity onPress={Call}>
             <View style={styles.item}>
               <View style={{ flex: 1 }}>
-                <Image
-                  source={require("../../../assets/icon/icons8-phone-50.png")}
-                  style={{ width: 25, height: 25 }}
-                  resizeMode="contain"
+                <MaterialCommunityIcons
+                  name="phone-in-talk-outline"
+                  size={25}
+                  color="#039375"
                 />
               </View>
               <View style={{ flex: 6 }}>
-                <Text style={styles.color}>Hỗ trợ qua điện thoại</Text>
+                <Text style={styles.color}>{t('supportViaPhone')}</Text>
               </View>
               <View>
-                <Image
-                  source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                  style={{ width: 15, height: 15 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#333333"
                 />
               </View>
             </View>
@@ -131,48 +160,70 @@ const Setting = () => {
           >
             <View style={styles.item}>
               <View style={{ flex: 1 }}>
-                <Image
-                  source={require("../../../assets/icon/icons8-language-50.png")}
-                  style={{ width: 25, height: 25 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="language-outline"
+                  size={25}
+                  color="#039375"
                 />
               </View>
               <View style={{ flex: 6 }}>
-                <Text style={styles.color}>Ngôn ngữ</Text>
+                <Text style={styles.color}>{t('language')}</Text>
               </View>
               <View>
-                <Image
-                  source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                  style={{ width: 15, height: 15 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#333333"
                 />
               </View>
             </View>
           </TouchableOpacity>
         </View>
-        <View>
-          <TouchableOpacity>
-            <View style={styles.item}>
+        <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            onPress={handleLogout}
+          >
+            <View style={[styles.item, { backgroundColor: '#fac0c3' }]}>
               <View style={{ flex: 1 }}>
-                <Image
-                  source={require("../../../assets/icon/icons8-log-out-48.png")}
-                  style={{ width: 30, height: 30 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="log-out-outline"
+                  size={25}
+                  color="#fff"
                 />
               </View>
               <View style={{ flex: 6 }}>
-                <Text style={styles.color}>Đăng xuất</Text>
+                <Text style={[styles.color, { color: "#333" }]}>{t('logout')}</Text>
               </View>
               <View>
-                <Image
-                  source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                  style={{ width: 15, height: 15 }}
-                  resizeMode="contain"
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#333333"
                 />
               </View>
             </View>
           </TouchableOpacity>
         </View>
+        <View style={{ marginTop: 50 }}>
+          <TouchableOpacity
+            onPress={handleDeleteAccount}
+          >
+            <View style={[styles.item, { backgroundColor: '#730108' }]}>
+              <View style={{ flex: 1 }}>
+                <MaterialCommunityIcons
+                  name="account-cancel"
+                  size={25}
+                  color="#fff"
+                />
+              </View>
+              <View style={{ flex: 6 }}>
+                <Text style={[styles.color, { color: "#fff" }]}>{t('deleteAccount')}</Text>
+              </View>
+
+            </View>
+          </TouchableOpacity>
+        </View>
+
       </View>
     </SafeAreaView>
   );

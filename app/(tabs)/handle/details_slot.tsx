@@ -2,8 +2,12 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, } from "re
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next"
+import Ionicons from '@expo/vector-icons/Ionicons'
+
 export default function DetailsSlotScreen() {
   const router = useRouter();
+  const { t } = useTranslation()
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
@@ -26,10 +30,10 @@ export default function DetailsSlotScreen() {
                 router.back();
               }}
             >
-              <Image
-                source={require("../../../assets/icon/icons8-back-48.png")}
-                style={{ width: 20, height: 20 }}
-                resizeMode="contain"
+              <Ionicons
+                name="chevron-back-outline"
+                size={28}
+                color="#fff"
               />
             </TouchableOpacity>
           </View>
@@ -42,7 +46,7 @@ export default function DetailsSlotScreen() {
             }}
           >
             <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
-              Thông tin lô hàng
+              {t('batchInformation')}
             </Text>
           </View>
         </View>
@@ -58,7 +62,7 @@ export default function DetailsSlotScreen() {
           <View style={styles.bg}>
             <View style={styles.item}>
               <View style={{ width: "65 %" }}>
-                <Text style={styles.text_2}>Nhà máy sản xuất</Text>
+                <Text style={styles.text_2}>{t('factory')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>XUÂN LẬP</Text>
@@ -66,7 +70,7 @@ export default function DetailsSlotScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Ngày sản xuất</Text>
+                <Text style={styles.text_2}>{t('productionDate')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>11-03-2025</Text>
@@ -74,7 +78,7 @@ export default function DetailsSlotScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Khối lượng bành</Text>
+                <Text style={styles.text_2}>{t('batchWeight')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>35 (kg)</Text>
@@ -82,7 +86,7 @@ export default function DetailsSlotScreen() {
             </View>
             <View style={styles.item}>
               <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>Khối lượng lô hàng</Text>
+                <Text style={styles.text_2}>{t('lotWeight')}</Text>
               </View>
               <View style={{ width: "35%", alignItems: "flex-end" }}>
                 <Text style={styles.text_3}>5,04 (tons/tấn)</Text>
@@ -95,13 +99,13 @@ export default function DetailsSlotScreen() {
             >
               <View style={styles.item}>
                 <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>Nguyên liệu nông trường</Text>
+                  <Text style={styles.text_2}>{t('agriculturalRawMaterials')}</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Image
-                    source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                    style={{ width: 15, height: 15 }}
-                    resizeMode="contain"
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={18}
+                    color="#333333"
                   />
                 </View>
               </View>
@@ -113,13 +117,13 @@ export default function DetailsSlotScreen() {
             >
               <View style={styles.item}>
                 <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>Kết quả kiểm phẩm</Text>
+                  <Text style={styles.text_2}>{t('qualityTestEesults')}</Text>
                 </View>
                 <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Image
-                    source={require("../../../assets/icon/icons8-arrow-right-30.png")}
-                    style={{ width: 15, height: 15 }}
-                    resizeMode="contain"
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={18}
+                    color="#333333"
                   />
                 </View>
               </View>
