@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "DNK",
+    "name": "DNK Trace",
     "slug": "DNK",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icon/app-icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -12,13 +12,21 @@
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "AIzaSyAg5v_Z-LMR-YuhOR12hPK3cFoQQwO6bvM"
+      },
+      "ios": {
+        "bundleIdentifier": "com.dongnaikraite.dnkc"
       }
     },
     "android": {
+      "package": "com.dongnaikraite.dnkc",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/icon/app-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -30,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/Logo_DNKC_RGB.png",
+          "image": "./assets/icon/app-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -39,8 +47,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "cameraPermission": "The application requires camera access to scan QR codes.",
           "recordAudioAndroid": true
         }
       ],
@@ -49,6 +56,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5a4546d1-7ead-4e8f-aa8c-10a3d0894254"
+      }
     }
   }
 }

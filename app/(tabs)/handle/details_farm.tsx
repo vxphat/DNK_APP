@@ -1,22 +1,48 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Animated, Linking, Alert, } from "react-native"
-import { useRouter } from "expo-router"
+import { useRouter, useLocalSearchParams } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
-import React, { useState, useRef } from "react"
+import React, { useRef, useEffect, useState } from 'react'
 import * as Clipboard from "expo-clipboard"
 import { SafeAreaView } from "react-native-safe-area-context"
-import MapView from "react-native-maps"
+import MapView, { Polygon, Marker } from "react-native-maps"
 import { useTranslation } from "react-i18next"
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useSelector } from "react-redux"
+import { RootState } from "../../../store"
+import axios from "axios"
+import LottieView from 'lottie-react-native'
+
+
+interface PlantationMapData {
+  geoemtry: [];
+  link: string;
+}
+
+interface BatchData {
+  farm: [];
+  RubberReceivingDate: string;
+  Truck: [];
+  PlantVariety: [];
+  RubberType: string;
+  TappingDate: [];
+  TreeLot: [];
+  PlantationMap: PlantationMapData[];
+}
 
 export default function DetailsFarmScreen() {
-  const router = useRouter();
+  const router = useRouter()
   const { t } = useTranslation()
+  const { batchCode } = useLocalSearchParams()
+  const token = useSelector((state: RootState) => state.auth.token)
+  const animation = useRef<LottieView>(null)
   const [dropdownStates, setDropdownStates] = useState([
     { isOpen: false, animation: new Animated.Value(0) },
     { isOpen: false, animation: new Animated.Value(0) },
     { isOpen: false, animation: new Animated.Value(0) },
     // Thêm các dropdown khác nếu cần
   ]);
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState<BatchData | null>(null)
 
   const toggleDropdown = (index: number) => {
     const newDropdownStates = [...dropdownStates];
@@ -28,39 +54,150 @@ export default function DetailsFarmScreen() {
     }).start();
     setDropdownStates(newDropdownStates);
   };
+
+  useEffect(() => {
+    fetchData(batchCode)
+  }, [batchCode])
+
+  const fetchData = async (batchCode: any) => {
+    setLoading(true)
+
+    try {
+      const response = await axios.get(`https://dongnaikratie.com/api/hop-dong/details-farm/${batchCode}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      if (response.data.status == true) {
+        setData(response.data.resutl as BatchData)
+
+      } else {
+        alert(t('errorLogin'));
+      }
+    } catch (error) {
+      console.error("Lỗi khi đăng nhập:", error);
+    }
+    setLoading(false);
+  }
+
   //Hàm render ra thông tin Lô vườn cây
-  const renderSlotDropdownContent = (index: number) => {
-    const height = dropdownStates[index].animation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 80], // Độ cao tối thiểu và tối đa của menu
-    });
+  const renderSlotDropdownContent = (index: number, TreeLot: any[]) => {
+    const animatedStyle = {
+      maxHeight: dropdownStates[index].animation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 200], // Chiều cao tối đa, thực tế sẽ tự động mở rộng theo nội dung
+        extrapolate: 'clamp',
+      }),
+      opacity: dropdownStates[index].animation,
+    };
 
     return (
-      <Animated.View
-        style={[
-          styles.dropdown,
-          { height },
-          { borderBottomWidth: dropdownStates[0].isOpen ? 1 : 0 },
-        ]}
-      >
+      <Animated.View style={[styles.dropdown, animatedStyle]}>
         <View style={styles.dropdown_1}>
-          <View style={styles.dropdownItem}>
-            <Text>1.04DN.NT1.09.114</Text>
-          </View>
-          <View style={styles.dropdownItem}>
-            <Text>1.04DN.NT1.09.115</Text>
-          </View>
+          {TreeLot.map((item: string, idx) => (
+            <View key={idx} style={styles.dropdownItem}>
+              <View>
+                <Text>{item}</Text>
+              </View>
+            </View>
+          ))}
         </View>
       </Animated.View>
     );
   };
+
+
   //Hàm render ra thông tin Bản đồ vườn cây
-  const renderMapDropdownContent = (index: number) => {
+  const renderMapDropdownContent = (index: number, mapData: any) => {
+    // Hàm chuyển đổi coordinates từ GeoJSON sang định dạng MapView và lấy thông tin name
+    const parseCoordinates = (geojsonCoordinates: any) => {
+      if (!geojsonCoordinates) return [];
+  
+      const polygons: { name: string; coordinates: { latitude: number; longitude: number }[] }[] = [];
+  
+      geojsonCoordinates.forEach((item: { name: string; json: string }) => {
+        const parsed = JSON.parse(item.json);
+  
+        if (parsed.type === "Polygon") {
+          const coords = parsed.coordinates[0].map(([longitude, latitude]: number[]) => ({
+            latitude,
+            longitude,
+          }));
+          polygons.push({ name: item.name, coordinates: coords });
+        } else if (parsed.type === "MultiPolygon") {
+          parsed.coordinates.forEach((poly: number[][][]) => {
+            const coords = poly[0].map(([longitude, latitude]: number[]) => ({
+              latitude,
+              longitude,
+            }));
+            polygons.push({ name: item.name, coordinates: coords });
+          });
+        }
+      });
+  
+      return polygons;
+    };
+  
+    // Tính toán trung tâm của một polygon
+    const getPolygonCenter = (coordinates: { latitude: number; longitude: number }[]) => {
+      let latSum = 0;
+      let lonSum = 0;
+      coordinates.forEach(point => {
+        latSum += point.latitude;
+        lonSum += point.longitude;
+      });
+      return {
+        latitude: latSum / coordinates.length,
+        longitude: lonSum / coordinates.length,
+      };
+    };
+  
+    // Tính toán vùng bao cho tất cả polygons để đặt initialRegion
+    const getMapRegion = (polygons: { coordinates: { latitude: number; longitude: number }[] }[]) => {
+      if (!polygons.length) return {
+        latitude: 13.28,
+        longitude: 106.25,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      };
+  
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      let minLon = Infinity;
+      let maxLon = -Infinity;
+  
+      polygons.forEach(polygon => {
+        polygon.coordinates.forEach((point: { latitude: number; longitude: number }) => {
+          minLat = Math.min(minLat, point.latitude);
+          maxLat = Math.max(maxLat, point.latitude);
+          minLon = Math.min(minLon, point.longitude);
+          maxLon = Math.max(maxLon, point.longitude);
+        });
+      });
+  
+      const latitude = (minLat + maxLat) / 2;
+      const longitude = (minLon + maxLon) / 2;
+      const latitudeDelta = (maxLat - minLat) * 1.2; // Thêm padding 20%
+      const longitudeDelta = (maxLon - minLon) * 1.2; // Thêm padding 20%
+  
+      return {
+        latitude,
+        longitude,
+        latitudeDelta,
+        longitudeDelta,
+      };
+    };
+  
+    const polygons = parseCoordinates(mapData.geoemtry);
+    const region = getMapRegion(polygons);
+  
     const height = dropdownStates[index].animation.interpolate({
       inputRange: [0, 1],
-      outputRange: [0, 260], // Độ cao tối thiểu và tối đa của menu
+      outputRange: [0, 260],
     });
-
+  
     return (
       <Animated.View
         style={[
@@ -72,13 +209,13 @@ export default function DetailsFarmScreen() {
         <View style={styles.dropdown_2}>
           <View style={{ marginTop: 10 }}>
             <TouchableOpacity onPress={LinkGIS}>
-              <Text>https://arcg.is/15DXH1221312</Text>
+              <Text>{mapData.link}</Text>
             </TouchableOpacity>
           </View>
           <View style={{ marginTop: 10 }}>
             <TouchableOpacity
               onPress={() => {
-                Clipboard.setStringAsync("https://arcg.is/15DXH12");
+                Clipboard.setStringAsync(mapData.link);
                 Alert.alert("Đã sao chép vào clipboard!");
               }}
             >
@@ -90,16 +227,32 @@ export default function DetailsFarmScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ height: 200, width: '100%', marginTop:10 }}>
-          <MapView style={styles.map} 
-            
-            initialRegion={{
-              latitude: 10.939421,
-              longitude: 107.186274,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          />
+        <View style={{ height: 200, width: '100%', marginTop: 10 }}>
+          <MapView
+            style={styles.map}
+            initialRegion={region}
+            zoomEnabled={true}
+          >
+            {/* Hiển thị tất cả polygons và markers */}
+            {polygons.map((polygon, idx) => {
+              const center = getPolygonCenter(polygon.coordinates);
+              return (
+                <React.Fragment key={idx}>
+                  <Polygon
+                    coordinates={polygon.coordinates}
+                    strokeWidth={2}
+                    strokeColor="rgba(0, 128, 255, 1)"
+                    fillColor="rgba(0, 128, 255, 0.4)"
+                  />
+                  <Marker coordinate={center}>
+                    <View style={styles.markerContainer}>
+                      <Text style={styles.markerText}>{polygon.name}</Text>
+                    </View>
+                  </Marker>
+                </React.Fragment>
+              );
+            })}
+          </MapView>
         </View>
       </Animated.View>
     );
@@ -187,154 +340,158 @@ export default function DetailsFarmScreen() {
             }}
           >
             <Text style={{ color: "white", fontWeight: 600, fontSize: 18 }}>
-            {t('batchInformation')}
+              {t('batchInformation')}
             </Text>
           </View>
         </View>
       </LinearGradient>
+      {loading ? (
+        <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10, justifyContent: 'center', alignItems: 'center' }}>
+          <LottieView
+            autoPlay
+            ref={animation}
+            style={{
+              width: 150,
+              height: 150,
+              backgroundColor: '#f1f4f2',
+            }}
 
-      <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
-        <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
-          <View style={styles.button_slot}>
-            <Text style={styles.text_1}>244616144</Text>
-          </View>
-
-          <View style={styles.bg}>
-            <View style={styles.item}>
-              <View style={{ width: "65 %" }}>
-                <Text style={styles.text_2}>{t('farm')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>Nông trường 1</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('rubberReceivingDate')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>11-03-2025</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('truckNumber')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>60H-12345</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('tripNumber')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>1</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "55%" }}>
-                <Text style={styles.text_2}>{t('plantVariety')}</Text>
-              </View>
-              <View style={{ width: "45%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>RRIV 124, RRIV 209</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('rubberType')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>Mủ chén</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('tappingDate')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>11-03-2025</Text>
-              </View>
-            </View>
-            <TouchableOpacity onPress={() => toggleDropdown(0)}>
-              <View
-                style={[
-                  styles.item,
-                  { borderBottomWidth: dropdownStates[0].isOpen ? 0 : 1 },
-                ]}
-              >
-                <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>{t('treePlot')}</Text>
-                </View>
-                <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Image
-                    source={
-                      dropdownStates[0].isOpen
-                        ? require("../../../assets/icon/icons8-arrow-down-30.png") // Hiển thị arrow-down khi dropdown mở
-                        : require("../../../assets/icon/icons8-arrow-right-30.png") // Hiển thị arrow-right khi dropdown đóng
-                    }
-                    style={[{ width: 15, height: 15 }]}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-            {renderSlotDropdownContent(0)}
-
-            <TouchableOpacity onPress={() => toggleDropdown(1)}>
-              <View
-                style={[
-                  styles.item,
-                  { borderBottomWidth: dropdownStates[1].isOpen ? 0 : 1 },
-                ]}
-              >
-                <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>{t('plantationMap')}</Text>
-                </View>
-                <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Image
-                    source={
-                      dropdownStates[1].isOpen
-                        ? require("../../../assets/icon/icons8-arrow-down-30.png") // Hiển thị arrow-down khi dropdown mở
-                        : require("../../../assets/icon/icons8-arrow-right-30.png") // Hiển thị arrow-right khi dropdown đóng
-                    }
-                    style={[{ width: 15, height: 15 }]}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-            {renderMapDropdownContent(1)}
-            <TouchableOpacity onPress={() => toggleDropdown(2)}>
-              <View
-                style={[
-                  styles.item,
-                  { borderBottomWidth: dropdownStates[2].isOpen ? 0 : 1 },
-                ]}
-              >
-                <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>GeoJson</Text>
-                </View>
-                <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Image
-                    source={
-                      dropdownStates[2].isOpen
-                        ? require("../../../assets/icon/icons8-arrow-down-30.png") // Hiển thị arrow-down khi dropdown mở
-                        : require("../../../assets/icon/icons8-arrow-right-30.png") // Hiển thị arrow-right khi dropdown đóng
-                    }
-                    style={[{ width: 15, height: 15 }]}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-            {renderGeoJsonDropdownContent(2)}
-
-          </View>
-
+            source={require('../../../assets/json/Animation - 1742433322825.json')}
+          />
         </View>
-      </ScrollView>
+      ) : (
 
+        <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2" }}>
+          {data && (
+            <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
+              <View style={styles.button_slot}>
+                <Text style={styles.text_1}>{batchCode}</Text>
+              </View>
+
+              <View style={styles.bg}>
+                <View style={styles.item}>
+                  <View style={{ width: "50 %" }}>
+                    <Text style={styles.text_2}>{t('farm')}</Text>
+                  </View>
+                  <View style={{ width: "50%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.farm.join(", ")}</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('rubberReceivingDate')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.RubberReceivingDate}</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('truckNumber')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>60H-12345</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('tripNumber')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>1</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "45%" }}>
+                    <Text style={styles.text_2}>{t('plantVariety')}</Text>
+                  </View>
+                  <View style={{ width: "55%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.PlantVariety.join(", ")}</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('rubberType')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.RubberType}</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('tappingDate')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.TappingDate.join(", ")}</Text>
+                  </View>
+                </View>
+                <TouchableOpacity onPress={() => toggleDropdown(0)}>
+                  <View
+                    style={[
+                      styles.item,
+                      { borderBottomWidth: dropdownStates[0].isOpen ? 0 : 1 },
+                    ]}
+                  >
+                    <View style={{ width: "65%" }}>
+                      <Text style={styles.text_2}>{t('treePlot')}</Text>
+                    </View>
+                    <View style={{ width: "35%", alignItems: "flex-end" }}>
+                      <Ionicons
+                        name={dropdownStates[0].isOpen ? 'chevron-down-outline' : 'chevron-forward-outline'}
+                        size={15}
+                        color="#333"
+                      />
+
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                {renderSlotDropdownContent(0, data.TreeLot)}
+
+                <TouchableOpacity onPress={() => toggleDropdown(1)}>
+                  <View
+                    style={[
+                      styles.item,
+                      { borderBottomWidth: dropdownStates[1].isOpen ? 0 : 1 },
+                    ]}
+                  >
+                    <View style={{ width: "65%" }}>
+                      <Text style={styles.text_2}>{t('plantationMap')}</Text>
+                    </View>
+                    <View style={{ width: "35%", alignItems: "flex-end" }}>
+                      <Ionicons
+                        name={dropdownStates[1].isOpen ? 'chevron-down-outline' : 'chevron-forward-outline'}
+                        size={15}
+                        color="#333"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                {renderMapDropdownContent(1, data.PlantationMap)}
+                <TouchableOpacity onPress={() => toggleDropdown(2)}>
+                  <View
+                    style={[
+                      styles.item,
+                      styles.noBoder,
+                    ]}
+                  >
+                    <View style={{ width: "65%" }}>
+                      <Text style={styles.text_2}>GeoJson</Text>
+                    </View>
+                    <View style={{ width: "35%", alignItems: "flex-end" }}>
+                      <Ionicons
+                        name={dropdownStates[2].isOpen ? 'chevron-down-outline' : 'chevron-forward-outline'}
+                        size={15}
+                        color="#333"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                {renderGeoJsonDropdownContent(2)}
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -379,7 +536,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOpacity: 0.1,
     width: "100%",
-    height: 1000,
+
     alignItems: "center",
     marginBottom: 100,
   },
@@ -392,13 +549,12 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomColor: "#EDE9E9",
     borderBottomWidth: 1,
-    width: "90%",
+    width: "95%",
   },
   dropdownItem: {
-    marginTop: 10,
-    padding: 10,
     backgroundColor: "#05D781",
     borderRadius: 30,
+    padding: 5
   },
   dropdown: {
     width: "90%",
@@ -414,5 +570,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
+  },
+  noBoder: {
+    borderBottomWidth: 0
+  },
+  markerContainer: {
+    backgroundColor: "rgba(0,0,0,0.6)",
+    padding: 3,
+    borderRadius: 2,
+  },
+  markerText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 12,
   },
 });

@@ -1,13 +1,28 @@
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, } from "react-native"
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ActivityIndicator} from "react-native"
 import { useRouter } from "expo-router"
+import React, { useState, useEffect } from 'react'
 import { LinearGradient } from "expo-linear-gradient"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useTranslation } from "react-i18next"
 import Ionicons from '@expo/vector-icons/Ionicons'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import axios from "axios"
 
 export default function DoiMatKhauScreen() {
   const router = useRouter();
-  const { t, i18n } = useTranslation();
+  const { t, } = useTranslation();
+  const [oldPassword, setOldPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [errorConfirmPw, setErrorConfirmPw] = useState(false)
+  
+
+  const handleLogin = async () => {
+    console.log('change password');
+  };
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
@@ -60,23 +75,84 @@ export default function DoiMatKhauScreen() {
         </View>
 
         <View style={{ marginTop: 20 }}>
-          <TextInput
-            placeholder={t('oldPassword')}
-            secureTextEntry
-            style={styles.input}
-          />
+          <View style={styles.bgInput}>
+            <View style={{ width: '10%' }}>
+              <MaterialCommunityIcons
+                name="form-textbox-password"
+                size={20}
+                color="#039375"
+              />
+            </View>
+            <TextInput
+              placeholder={t('oldPassword')}
+              style={styles.input}
+              value={oldPassword}
+              secureTextEntry={showPassword}
+              onChangeText={setOldPassword}
+            />
+            <TouchableOpacity style={{ width: '10%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setShowPassword(!showPassword)}>
+              <MaterialCommunityIcons
+                name={showPassword ? "eye-outline" : 'eye-off-outline'}
+                size={20}
+                color="#333"
+              />
+            </TouchableOpacity>
+          </View>
 
-          <TextInput
-            placeholder={t('newPassword')}
-            secureTextEntry
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder={t('confirmPassword')}
-            secureTextEntry
-            style={styles.input}
-          />
+          <View style={[styles.bgInput, {borderWidth: errorConfirmPw ? 1 : 0, borderColor:'#f66'}]}>
+            <View style={{ width: '10%' }}>
+              <MaterialCommunityIcons
+                name="form-textbox-password"
+                size={20}
+                color="#039375"
+              />
+            </View>
+            <TextInput
+              placeholder={t('newPassword')}
+              style={[styles.input]}
+              value={newPassword}
+              secureTextEntry={showPassword}
+              onChangeText={setNewPassword}
+            />
+            <TouchableOpacity style={{ width: '10%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setShowPassword(!showPassword)}>
+              <MaterialCommunityIcons
+                name={showPassword ? "eye-outline" : 'eye-off-outline'}
+                size={20}
+                color="#333"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.bgInput, {borderWidth: errorConfirmPw ? 1 : 0, borderColor:'#f66'}]}>
+            <View style={{ width: '10%' }}>
+              <MaterialCommunityIcons
+                name="form-textbox-password"
+                size={20}
+                color="#039375"
+              />
+            </View>
+            <TextInput
+              placeholder={t('confirmPassword')}
+              style={styles.input}
+              value={confirmPassword}
+              secureTextEntry={showPassword}
+              onChangeText={(text)=>{
+                setConfirmPassword(text)
+                if(newPassword!=text){
+                  setErrorConfirmPw(true)
+                }else{
+                  setErrorConfirmPw(false)
+                }
+              }}
+            />
+            <TouchableOpacity style={{ width: '10%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setShowPassword(!showPassword)}>
+              <MaterialCommunityIcons
+                name={showPassword ? "eye-outline" : 'eye-off-outline'}
+                size={20}
+                color="#333"
+              />
+            </TouchableOpacity>
+          </View>
+         
 
           <LinearGradient colors={["#05D781", "#039375"]} style={styles.button}>
             <TouchableOpacity
@@ -84,7 +160,12 @@ export default function DoiMatKhauScreen() {
                 Alert.alert("Mật khẩu đã được thay đổi!");
               }}
             >
-              <Text style={styles.text}>{t('changePassword')}</Text>
+              {loading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.text}>{t('changePassword')}</Text>
+                )}
+              
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -106,17 +187,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
-    paddingVertical: 0,
-    padding: 20,
-    marginBottom: 15,
-    borderRadius: 35,
-    backgroundColor: "#fff",
-    height: 45,
-    color: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 10,
-    shadowOpacity: 0.1,
-    fontSize: 16,
+    borderRadius: 35, height: 50, color: "#000", fontSize: 18, paddingVertical: 0, width: '80%'
   },
   text: {
     color: "white",
@@ -125,4 +196,7 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     textTransform: "uppercase"
   },
+  bgInput: {
+    flexDirection: 'row', paddingVertical: 0, padding: 20, marginBottom: 15, borderRadius: 35, backgroundColor: "#fff", height: 50, alignItems: 'center'
+  }
 });

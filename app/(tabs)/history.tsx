@@ -17,7 +17,7 @@ const Page = () => {
   const renderItem = ({ item }: { item: { batchCode: string; datetime: string } }) => (
     <TouchableOpacity style={styles.item}
       onPress={()=>{
-        router.push("/(tabs)/handle/details_slot")
+        router.push(`/(tabs)/handle/details_slot?batchCode=${item.batchCode}`)
       }}
     >
 

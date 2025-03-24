@@ -8,19 +8,30 @@ import { changeLanguage } from "../../../store/slice/langSlice"
 import { RootState } from "../../../store"
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from "react-i18next"
-
+import * as Localization from 'expo-localization';
 
 
 export default function languageScreen() {
   const dispatch = useDispatch();
   const router = useRouter();
   const language = useSelector((state: RootState) => state.lang.language);
+  const [currentLanguage, setCurrentLanguage] = useState('vi')
+
   const { t, i18n } = useTranslation();
 
   const langeArray = [
     { id: 'vi', language: 'Vietnamese' },
     { id: 'en', language: 'English' }
   ]
+  const deviceLanguage = Localization.locale.split("-")[0];
+  useEffect(() => {
+    
+    if (language !== deviceLanguage) {
+      i18n.changeLanguage(deviceLanguage); // Đổi ngôn ngữ i18n theo thiết bị
+      dispatch(changeLanguage({ language: deviceLanguage })); // Cập nhật Redux store
+    }
+    
+  }, [])
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>

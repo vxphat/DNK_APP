@@ -45,6 +45,19 @@
     "treePlot":"Lô vườn cây",
     "plantationMap":"Bản đồ vườn cây",
     "scanQRCode":"Quét mã QR",
+    "weNeedYourPermissionToShowTheCamera":"Ứng dụng cần cấp quyền truy cập camera",
+    "grantPermission":"Cấp phép",
+    "policy":"Điều khoản sử dụng",
+    "errorLogin":"Lỗi đăng nhập. Vui lòng kiểm tra lại thông tin",
+    "tons":"Tấn",
+    "qualityInspectionResults":"Kết quả kiểm phẩm",
+    "sampleSubmissionDate":"Ngày gửi mẫu",
+    "testDate":"Ngày kiểm nghiệm",
+    "rating":"Xếp hạng",
+    "impurities":"Chất bẩn",
+    "evaporation":"Bay hơi",
+    "color":"Màu",
+    "theBatchCodeDoesNotExist":"Mã lô hàng không tồn tại.",
     "language":"Ngôn ngữ"
 }
   

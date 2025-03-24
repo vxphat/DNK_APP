@@ -1,13 +1,63 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, } from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, } from "react-native"
+import { useRouter, useLocalSearchParams } from "expo-router"
+import { LinearGradient } from "expo-linear-gradient"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { useTranslation } from "react-i18next"
 import Ionicons from '@expo/vector-icons/Ionicons'
+import React, { useRef, useEffect, useState } from 'react'
+import { RootState } from "../../../store"
+import LottieView from 'lottie-react-native'
+import axios from "axios"
+import { useSelector } from "react-redux"
+
+interface BatchData {
+  NhaMay: string;
+  NgaySanXuat: string;
+  KhoiLong: string;
+  KhoiLuongBanh:string;
+}
+
 
 export default function DetailsSlotScreen() {
-  const router = useRouter();
+  const router = useRouter()
   const { t } = useTranslation()
+  const token = useSelector((state: RootState) => state.auth.token);
+  const { batchCode } = useLocalSearchParams()
+  const animation = useRef<LottieView>(null)
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState<BatchData | null>(null)
+
+  useEffect(() => {
+    fetchData(batchCode)
+  }, [batchCode])
+
+
+  const fetchData = async (batchCode: any) => {
+    setLoading(true)
+    // console.log(123, token, batchCode)
+    try {
+      const response = await axios.post(`https://dongnaikratie.com/api/hop-dong/dueDiligenceStatement`, {
+        MaLoCanXuat: batchCode,
+        type: 'json',
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      if (response.data.status == true) {
+        
+        setData(response.data.json as BatchData)
+      } else {
+        
+        alert(t('theBatchCodeDoesNotExist'));
+      }
+    } catch (error) {
+      console.error("Lỗi khi đăng nhập:", error);
+    }
+    setLoading(false);
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#05D781" }} edges={["top"]}>
@@ -54,83 +104,106 @@ export default function DetailsSlotScreen() {
 
       {/* Nội dung chính */}
 
-      <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
-        <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
-          <View style={styles.button_slot}>
-            <Text style={styles.text_1}>244616142</Text>
-          </View>
-          <View style={styles.bg}>
-            <View style={styles.item}>
-              <View style={{ width: "65 %" }}>
-                <Text style={styles.text_2}>{t('factory')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>XUÂN LẬP</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('productionDate')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>11-03-2025</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('batchWeight')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>35 (kg)</Text>
-              </View>
-            </View>
-            <View style={styles.item}>
-              <View style={{ width: "65%" }}>
-                <Text style={styles.text_2}>{t('lotWeight')}</Text>
-              </View>
-              <View style={{ width: "35%", alignItems: "flex-end" }}>
-                <Text style={styles.text_3}>5,04 (tons/tấn)</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/(tabs)/handle/details_farm");
-              }}
-            >
-              <View style={styles.item}>
-                <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>{t('agriculturalRawMaterials')}</Text>
-                </View>
-                <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={18}
-                    color="#333333"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/(tabs)/handle/details_testing");
-              }}
-            >
-              <View style={styles.item}>
-                <View style={{ width: "65%" }}>
-                  <Text style={styles.text_2}>{t('qualityTestEesults')}</Text>
-                </View>
-                <View style={{ width: "35%", alignItems: "flex-end" }}>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={18}
-                    color="#333333"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
+      {loading ? (
+        <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10, justifyContent: 'center', alignItems: 'center' }}>
+          <LottieView
+            autoPlay
+            ref={animation}
+            style={{
+              width: 150,
+              height: 150,
+              backgroundColor: '#f1f4f2',
+            }}
+
+            source={require('../../../assets/json/Animation - 1742433322825.json')}
+          />
         </View>
-      </ScrollView>
+      ) : (
+        <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
+          {data && (
+            <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
+              <View style={styles.button_slot}>
+                <Text style={styles.text_1}>{batchCode}</Text>
+              </View>
+              <View style={styles.bg}>
+                <View style={styles.item}>
+                  <View style={{ width: "65 %" }}>
+                    <Text style={styles.text_2}>{t('factory')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.NhaMay}</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('productionDate')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.NgaySanXuat}</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('batchWeight')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{data.KhoiLuongBanh} (kg)</Text>
+                  </View>
+                </View>
+                <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('lotWeight')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    
+                    <Text style={styles.text_3}>{data.KhoiLong ? (parseFloat(data.KhoiLong.replace(/,/g, ""))/1000).toFixed(2) : 0} ({t('tons')})</Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push(`/(tabs)/handle/details_farm?batchCode=${batchCode}`);
+                  }}
+                >
+                  <View style={styles.item}>
+                    <View style={{ width: "65%" }}>
+                      <Text style={styles.text_2}>{t('agriculturalRawMaterials')}</Text>
+                    </View>
+                    <View style={{ width: "35%", alignItems: "flex-end" }}>
+                      <Ionicons
+                        name="chevron-forward-outline"
+                        size={18}
+                        color="#333333"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push(`/(tabs)/handle/details_testing?batchCode=${batchCode}`);
+                  }}
+                >
+                  <View style={[styles.item, styles.noBoder]}>
+                    <View style={{ width: "65%" }}>
+                      <Text style={styles.text_2}>{t('qualityInspectionResults')}</Text>
+                    </View>
+                    <View style={{ width: "35%", alignItems: "flex-end" }}>
+                      <Ionicons
+                        name="chevron-forward-outline"
+                        size={18}
+                        color="#333333"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+        </View>
+      )}
+
+
+
 
     </SafeAreaView>
 
@@ -177,7 +250,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOpacity: 0.1,
     width: "100%",
-    height: 320,
     alignItems: "center",
     marginBottom: 300,
   },
@@ -187,5 +259,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#EDE9E9",
     borderBottomWidth: 1,
     width: "90%",
+  },
+  noBoder: {
+    borderBottomWidth: 0
   },
 });

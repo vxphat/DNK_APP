@@ -45,6 +45,19 @@
     "treePlot":"Tree plot",
     "plantationMap":"Plantation map",
     "scanQRCode":"Scan QR Code",
+    "weNeedYourPermissionToShowTheCamera":" We need your permission to show the camera",
+    "grantPermission":"Grant permission",
+    "policy":"Policy",
+    "errorLogin":"Login error. Please check your information.",
+    "tons":"Tons",
+    "qualityInspectionResults":"Quality Inspection Results",
+    "sampleSubmissionDate":"Sample Submission Date",
+    "testDate":"Testing Date",
+    "rating":"Ranking",
+    "impurities":"Impurities",
+    "evaporation":"Evaporation",
+    "color":"Color",
+    "theBatchCodeDoesNotExist":"The batch code does not exist.",
     "language":"Language"
 }
   
