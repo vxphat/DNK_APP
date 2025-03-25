@@ -5,8 +5,11 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { useTranslation } from "react-i18next"
 import React, { useState } from "react"
 import Ionicons from "@expo/vector-icons/Ionicons"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { addHistory } from "../../../store/slice/historySlice"
+import axios from "axios"
+import { RootState } from "../../../store"
+import { useSelector } from "react-redux"
 
 
 export default function HandleScreen() {
@@ -16,29 +19,53 @@ export default function HandleScreen() {
   const [batchCode, setBatchCode] = useState("")
   const [errorInt, setErrorInt] = useState(false)
   const [errorCount, setErrorCount] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const token = useSelector((state: RootState) => state.auth.token)
 
   const handleInputChange = (text: string) => {
     if (text.length <= 10) {
       setBatchCode(text);
     }
 
-
     // Kiểm tra xem có phải số nguyên không
     const isInteger = /^\d+$/.test(text);
     setErrorInt(!isInteger);
 
     // Kiểm tra độ dài phải đúng 10 ký tự
-    setErrorCount(text.length !== 10);
+    setErrorCount(text.length !== 10 && text.length !== 11);
   };
 
   // Xác định trạng thái nút check
   const isValid = !errorInt && !errorCount && batchCode.length > 0;
 
 
-  const handleCheck = () => {
+  const handleCheck = async () => {
     if (batchCode.length == 10) {
-      dispatch(addHistory({ batchCode: batchCode }));
-      router.push("/(tabs)/handle/details_slot")
+      setLoading(true)
+      try {
+        const response = await axios.post(`https://dongnaikratie.com/api/hop-dong/dueDiligenceStatement`, {
+          MaLoCanXuat: batchCode,
+          type: 'json',
+        },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+        if (response.data.status == true) {
+          dispatch(addHistory({ batchCode: batchCode }));
+          router.push(`/(tabs)/handle/details_slot?batchCode=${batchCode}`)
+          
+        } else {
+          
+          alert(t('theBatchCodeDoesNotExist'));
+        }
+      } catch (error) {
+        console.error("Lỗi khi đăng nhập:", error);
+      }
+      
+      setLoading(false);
     }
   }
 
@@ -110,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     height: 60,
     color: "#313131",
-    fontSize: 25,
+    fontSize: 20,
     textAlign: "center",
     fontWeight: "700",
     borderWidth: 1,

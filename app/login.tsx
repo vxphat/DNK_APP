@@ -1,5 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, } from "react-native"
-import React, { useState, useEffect } from 'react'
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from "react-native"
+import React, { useState } from 'react'
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { useDispatch, useSelector } from "react-redux"
@@ -7,24 +7,36 @@ import { login } from "../store/slice/authSlice"
 import { RootState } from "../store"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useTranslation } from "react-i18next"
+import axios from "axios"
 
 export default function DangNhapScreen() {
-  const router = useRouter();
-  const { t } = useTranslation();
-  const dispatch = useDispatch();
+  const router = useRouter()
+  const { t } = useTranslation()
+  const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.auth.user);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(true);
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(true)
+  const [loading, setLoading] = useState(false)
 
 
-  const handleLogin = () => {
-    if (username === "Admin" && password === "123456") {
-      dispatch(login({ token: 'token Nè', user: 'username nè' }));
-      router.push("/(tabs)");
-    } else {
-      alert("Sai tên đăng nhập hoặc mật khẩu!");
+  const handleLogin = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.post(`https://dongnaikratie.com/api/auth/login`, {
+        phonenumber: username,
+        password: password,
+      });
+      if(response.data.status == true){
+        router.push("/(tabs)");
+        dispatch(login({ token: response.data.token, user: response.data.user }));
+      }else {
+        alert(t('errorLogin'));
+      }
+    } catch (error) {
+      console.error("Lỗi khi đăng nhập:", error);
     }
+    setLoading(false);
   };
 
   return (
@@ -48,7 +60,7 @@ export default function DangNhapScreen() {
               <View style={{ width: "100%", paddingHorizontal: 20, marginTop: 20 }}>
 
                 <View style={styles.bgInput}>
-                <View style={{ width: '10%' }}>
+                  <View style={{ width: '10%' }}>
                     <MaterialCommunityIcons
                       name="account"
                       size={20}
@@ -78,7 +90,7 @@ export default function DangNhapScreen() {
                     value={password}
                     onChangeText={setPassword}
                   />
-                  <TouchableOpacity style={{ width: '10%', justifyContent:'center', alignItems:'center' }} onPress={()=>setShowPassword(!showPassword)}>
+                  <TouchableOpacity style={{ width: '10%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setShowPassword(!showPassword)}>
                     <MaterialCommunityIcons
                       name={showPassword ? "eye-outline" : 'eye-off-outline'}
                       size={20}
@@ -91,7 +103,13 @@ export default function DangNhapScreen() {
                   <TouchableOpacity
                     onPress={handleLogin}
                   >
-                    <Text style={styles.text}>{t('login')}</Text>
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.text}>{t('login')}</Text>
+                    )}
+
+
                   </TouchableOpacity>
                 </LinearGradient>
               </View>
@@ -108,12 +126,12 @@ const styles = StyleSheet.create({
     marginTop: 20, width: "100%", height: 50, borderRadius: 50, justifyContent: "center",
   },
   input: {
-   borderRadius: 35,  height: 50, color: "#000", fontSize: 18, paddingVertical: 0, width: '80%'
+    borderRadius: 35, height: 50, color: "#000", fontSize: 18, paddingVertical: 0, width: '80%'
   },
   text: {
-    color: "white", textAlign: "center", fontSize: 18, fontWeight: "700",textTransform: "uppercase"
+    color: "white", textAlign: "center", fontSize: 18, fontWeight: "700", textTransform: "uppercase"
   },
   bgInput: {
-    flexDirection: 'row', paddingVertical: 0, padding: 20, marginBottom: 15, borderRadius: 35, backgroundColor: "#fff", height: 50, alignItems:'center'
+    flexDirection: 'row', paddingVertical: 0, padding: 20, marginBottom: 15, borderRadius: 35, backgroundColor: "#fff", height: 50, alignItems: 'center'
   }
 });

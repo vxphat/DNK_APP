@@ -1,17 +1,18 @@
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "../store";
+import { RootState } from "../store"; // Import để lấy token từ Redux
 import "../locales/i18n"; 
 
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Ngăn splash screen tự động ẩn trước khi tải xong asset
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function MainApp() {
+  const token = useSelector((state: RootState) => state.auth.token);
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -27,14 +28,21 @@ export default function RootLayout() {
   }
 
   return (
+    <Stack screenOptions={{ headerShown: false }} initialRouteName="login">
+      <Stack.Screen name="login" />
+      <Stack.Screen name="index" />
+      <Stack.Screen name="handle" />
+      <Stack.Screen name="scan" />
+      <Stack.Screen name="history" />
+      <Stack.Screen name="setting" />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <Provider store={store}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="handle" />
-        <Stack.Screen name="scan" />
-        <Stack.Screen name="history" />
-        <Stack.Screen name="setting" />
-      </Stack>
+      <MainApp />
     </Provider>
   );
 }

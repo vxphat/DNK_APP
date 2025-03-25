@@ -4,20 +4,21 @@ import { useRouter } from "expo-router"
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { LinearGradient } from "expo-linear-gradient"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useSelector } from "react-redux"
+
+import { useDispatch } from "react-redux"
+import { logout } from "../../../store/slice/authSlice"
 import { RootState } from "../../../store"
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from "react-i18next"
 
+
 const Setting = () => {
   const router = useRouter();
-  const user = useSelector((state: RootState) => state.auth.user);
+  
   const { t } = useTranslation();
+  const dispatch = useDispatch()
 
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  
 
   const sendEmail = () => {
     const url = "mailto:caosudnkc@gmail.com?subject=&body=";
@@ -48,6 +49,7 @@ const Setting = () => {
         style: 'cancel',
       },
       { text: t('ok'), onPress: () => {
+        dispatch(logout());
         router.push("../../login");
       } },
     ]);
@@ -168,6 +170,33 @@ const Setting = () => {
               </View>
               <View style={{ flex: 6 }}>
                 <Text style={styles.color}>{t('language')}</Text>
+              </View>
+              <View>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={18}
+                  color="#333333"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/(tabs)/setting/language");
+            }}
+          >
+            <View style={styles.item}>
+              <View style={{ flex: 1 }}>
+                <Ionicons
+                  name="earth-outline"
+                  size={25}
+                  color="#039375"
+                />
+              </View>
+              <View style={{ flex: 6 }}>
+                <Text style={styles.color}>{t('policy')}</Text>
               </View>
               <View>
                 <Ionicons

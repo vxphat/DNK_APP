@@ -1,15 +1,19 @@
 import { Button, StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
+import { useRouter } from "expo-router"
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera'
 import { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { BarCodeScanner } from "expo-barcode-scanner"
+import { addHistory } from "../../store/slice/historySlice"
+import { useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"
 
 
 const Page = () => {
     const [facing, setFacing] = useState<CameraType>('back')
+    const dispatch = useDispatch()
+    const router = useRouter()
     const [permission, requestPermission] = useCameraPermissions()
     const [scanned, setScanned] = useState(false); // Thêm state để theo dõi trạng thái quét
     const [qrData, setQrData] = useState(""); // Lưu dữ liệu mã QR
@@ -25,9 +29,9 @@ const Page = () => {
         return (
             <View style={styles.container}>
                 <Text style={styles.message}>
-                    We need your permission to show the camera
+                    {t('weNeedYourPermissionToShowTheCamera')}
                 </Text>
-                <Button onPress={requestPermission} title="grant permission" />
+                <Button onPress={requestPermission} title={t("grantPermission")} />
             </View>
         );
     }
@@ -35,6 +39,8 @@ const Page = () => {
         if (!scanned) {
             setScanned(true); // Tạm dừng quét
             setQrData(data);
+            dispatch(addHistory({ batchCode: data }));
+            router.push(`/(tabs)/handle/details_slot?batchCode=${data}`)
             alert(`Mã QR: ${data} (Loại: ${type})`);
         }
     };
@@ -94,19 +100,19 @@ const Page = () => {
                             <View style={[styles.mask, { width: "15%" }]} />
 
                             {/* Vùng quét QR */}
-                            <View style={[styles.scanArea, {height:'100%'}]}>
+                            <View style={[styles.scanArea, {width:'70%'}]}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <View style={{ width: 50, height: 50, borderLeftWidth: 5, borderTopWidth: 5, borderColor: 'white' }} />
+                                    <View style={{ width: 50, height: 50, borderLeftWidth: 8, borderTopWidth: 8, borderColor: 'white', borderTopLeftRadius:20 }} />
                                     <View style={{ width: 200, height: 50 }} />
-                                    <View style={{ width: 50, height: 50, borderRightWidth: 5, borderTopWidth: 5, borderColor: 'white' }} />
+                                    <View style={{ width: 50, height: 50, borderRightWidth: 8, borderTopWidth: 8, borderColor: 'white', borderTopRightRadius:20 }} />
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={{ width: 300, height: 200 }} />
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <View style={{ width: 50, height: 50, borderLeftWidth: 5, borderBottomWidth: 5, borderColor: 'white' }} />
+                                    <View style={{ width: 50, height: 50, borderLeftWidth: 8, borderBottomWidth: 8, borderColor: 'white', borderBottomLeftRadius:20 }} />
                                     <View style={{ width: 200, height: 50 }} />
-                                    <View style={{ width: 50, height: 50, borderRightWidth: 5, borderBottomWidth: 5, borderColor: 'white' }} />
+                                    <View style={{ width: 50, height: 50, borderRightWidth: 8, borderBottomWidth: 8, borderColor: 'white', borderBottomRightRadius:20 }} />
                                 </View>
                             </View>
 
@@ -152,7 +158,7 @@ const styles = StyleSheet.create({
 
     },
     mask: {
-        backgroundColor: "rgba(0, 0, 0, 0.7)", // Màu tối mờ
+        // backgroundColor: "rgba(0, 0, 0, 0.7)", // Màu tối mờ
     },
     scanArea: {
         width: 300,
