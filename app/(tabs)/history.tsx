@@ -16,7 +16,7 @@ const Page = () => {
 
   const renderItem = ({ item }: { item: { batchCode: string; datetime: string } }) => (
     <TouchableOpacity style={styles.item}
-      onPress={()=>{
+      onPress={() => {
         router.push(`/(tabs)/handle/details_slot?batchCode=${item.batchCode}`)
       }}
     >
@@ -26,9 +26,15 @@ const Page = () => {
         size={50}
         color="#039375"
       />
-      <View style={{paddingLeft:20}}>
+      <View style={{ paddingLeft: 20 }}>
         <Text style={styles.code}>{item.batchCode}</Text>
-        <Text style={styles.date}>{item.datetime}</Text>
+        <Text style={styles.date}>
+        {new Date(item.datetime).toLocaleDateString("en-CA") + " " + new Date(item.datetime).toLocaleTimeString("en-CA", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -101,7 +107,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     flexDirection: 'row',
-    alignItems:'center'
+    alignItems: 'center'
   },
   code: {
     fontSize: 22,

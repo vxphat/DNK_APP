@@ -38,6 +38,8 @@
     "farm":"Farm",
     "rubberReceivingDate":"Rubber receiving date",
     "truckNumber":"Truck number",
+    "transport":"transport",
+    "Reception":"Date of receipt",
     "tripNumber":"Trip number",
     "plantVariety":"Plant variety",
     "rubberType":"Rubber type",

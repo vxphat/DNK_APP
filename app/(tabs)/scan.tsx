@@ -41,7 +41,6 @@ const Page = () => {
             setQrData(data);
             dispatch(addHistory({ batchCode: data }));
             router.push(`/(tabs)/handle/details_slot?batchCode=${data}`)
-            alert(`Mã QR: ${data} (Loại: ${type})`);
         }
     };
 

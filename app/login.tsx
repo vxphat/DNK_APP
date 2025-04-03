@@ -1,9 +1,9 @@
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from "react-native"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { useDispatch, useSelector } from "react-redux"
-import { login } from "../store/slice/authSlice"
+import { login, setUserInfo } from "../store/slice/authSlice"
 import { RootState } from "../store"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { useTranslation } from "react-i18next"
@@ -13,12 +13,19 @@ export default function DangNhapScreen() {
   const router = useRouter()
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector((state: RootState) => state.auth);
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [storePassword, setStorePassword] = useState(false)
 
+  useEffect(() => {
+    
+    if(user){
+      router.push("/(tabs)");
+    }
+  }, [])
 
   const handleLogin = async () => {
     setLoading(true)
@@ -27,10 +34,12 @@ export default function DangNhapScreen() {
         phonenumber: username,
         password: password,
       });
-      if(response.data.status == true){
+      if (response.data.status == true) {
         router.push("/(tabs)");
+        
+        dispatch(setUserInfo({ token: response.data.token, user: response.data.user }));
         dispatch(login({ token: response.data.token, user: response.data.user }));
-      }else {
+      } else {
         alert(t('errorLogin'));
       }
     } catch (error) {
@@ -98,7 +107,17 @@ export default function DangNhapScreen() {
                     />
                   </TouchableOpacity>
                 </View>
-
+                <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center' }}
+                  onPress={() => { setStorePassword(!storePassword) }}
+                >
+                  <MaterialCommunityIcons
+                    name={storePassword ? "checkbox-blank-outline" : 'checkbox-marked-outline'}
+                    size={20}
+                    color="#039375"
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text style={{ fontWeight: '500', color: '#' }}>Lưu đăng nhập</Text>
+                </TouchableOpacity>
                 <LinearGradient colors={["#05D781", "#039375"]} style={styles.button}>
                   <TouchableOpacity
                     onPress={handleLogin}

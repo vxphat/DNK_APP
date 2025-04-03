@@ -16,6 +16,7 @@ const TabLayout = () => {
       <Tabs.Screen name="scan" options={{ title: "Quét Qr" }}></Tabs.Screen>
       <Tabs.Screen name="history" options={{ title:  t("history") }}></Tabs.Screen>
       <Tabs.Screen name="setting" options={{ title:  t("setting") }}></Tabs.Screen>
+      
     </Tabs>
   );
 };

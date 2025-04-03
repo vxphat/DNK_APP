@@ -122,7 +122,7 @@ export default function DetailsTestingScreen() {
             <Text style={styles.text_3}>{data.color}</Text>
           </View>
         </View>
-        <View style={styles.item}>
+        <View style={[styles.item, {borderBottomWidth:0}]}>
           <View style={{ width: "65%" }}>
             <Text style={styles.text_2}>SVR VR</Text>
           </View>
@@ -195,7 +195,7 @@ export default function DetailsTestingScreen() {
           />
         </View>
       ) : (
-        <View style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
+        <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2", paddingHorizontal: 10 }}>
           <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
             <View style={styles.button_slot}>
               <Text style={styles.text_1}>{batchCode}</Text>
@@ -235,7 +235,7 @@ export default function DetailsTestingScreen() {
             )}
 
           </View>
-        </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );
@@ -281,7 +281,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOpacity: 0.1,
     width: "100%",
-    height: 580,
     alignItems: "center",
     marginBottom: 100,
   },

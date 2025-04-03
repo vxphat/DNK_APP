@@ -27,6 +27,10 @@ export default function HandleLayout() {
         name="camera"
         options={{ title: "Test Camera", headerShown: false }}
       />
+      <Stack.Screen
+        name="details_map"
+        options={{ title: "Test Camera", headerShown: false }}
+      />
     </Stack>
   );
 }

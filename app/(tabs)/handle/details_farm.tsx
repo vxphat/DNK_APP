@@ -13,26 +13,25 @@ import axios from "axios"
 import LottieView from 'lottie-react-native'
 
 
+
 interface PlantationMapData {
   geoemtry: [];
   link: string;
 }
 
 interface BatchData {
-  farm: [];
-  RubberReceivingDate: string;
-  Truck: [];
-  PlantVariety: [];
-  RubberType: string;
-  TappingDate: [];
-  TreeLot: [];
-  PlantationMap: PlantationMapData[];
+  farmName: string;
+  detailArea: string;
+  licensePlate: string;
+  materialCarCount: string;
+  detailTappingDay: string;
+  materialDateOfReceipt: string;
 }
 
 export default function DetailsFarmScreen() {
   const router = useRouter()
   const { t } = useTranslation()
-  const { batchCode } = useLocalSearchParams()
+  const { farmName, farmID, batchCode, dateOfReceipt, ngayCao, soXe, soChuyen, loaiMu } = useLocalSearchParams()
   const token = useSelector((state: RootState) => state.auth.token)
   const animation = useRef<LottieView>(null)
   const [dropdownStates, setDropdownStates] = useState([
@@ -42,7 +41,7 @@ export default function DetailsFarmScreen() {
     // Thêm các dropdown khác nếu cần
   ]);
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState<BatchData | null>(null)
+  const [data, setData] = useState(true)
 
   const toggleDropdown = (index: number) => {
     const newDropdownStates = [...dropdownStates];
@@ -55,32 +54,33 @@ export default function DetailsFarmScreen() {
     setDropdownStates(newDropdownStates);
   };
 
-  useEffect(() => {
-    fetchData(batchCode)
-  }, [batchCode])
+  
 
-  const fetchData = async (batchCode: any) => {
+  const fetchData = async (farm: any, batchCode: any) => {
     setLoading(true)
-
+    // console.log(123, token, batchCode)
     try {
-      const response = await axios.get(`https://dongnaikratie.com/api/hop-dong/details-farm/${batchCode}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+      const response = await axios.get(`https://dongnaikratie.com/api/hop-dong/farm-information`, {
+        params: { farm: farm, batchCode: batchCode,  },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (response.data.status == true) {
-        setData(response.data.resutl as BatchData)
+        console.log(123123, response.data)
 
       } else {
-        alert(t('errorLogin'));
+
+        alert(t('theBatchCodeDoesNotExist'));
       }
     } catch (error) {
       console.error("Lỗi khi đăng nhập:", error);
     }
     setLoading(false);
   }
+
+
 
   //Hàm render ra thông tin Lô vườn cây
   const renderSlotDropdownContent = (index: number, TreeLot: any[]) => {
@@ -98,9 +98,13 @@ export default function DetailsFarmScreen() {
         <View style={styles.dropdown_1}>
           {TreeLot.map((item: string, idx) => (
             <View key={idx} style={styles.dropdownItem}>
-              <View>
+              <TouchableOpacity
+                onPress={() => {
+                  router.push(`/(tabs)/handle/details_map?idMap=${item}`);
+                }}
+              >
                 <Text>{item}</Text>
-              </View>
+              </TouchableOpacity>
             </View>
           ))}
         </View>
@@ -114,12 +118,12 @@ export default function DetailsFarmScreen() {
     // Hàm chuyển đổi coordinates từ GeoJSON sang định dạng MapView và lấy thông tin name
     const parseCoordinates = (geojsonCoordinates: any) => {
       if (!geojsonCoordinates) return [];
-  
+
       const polygons: { name: string; coordinates: { latitude: number; longitude: number }[] }[] = [];
-  
+
       geojsonCoordinates.forEach((item: { name: string; json: string }) => {
         const parsed = JSON.parse(item.json);
-  
+
         if (parsed.type === "Polygon") {
           const coords = parsed.coordinates[0].map(([longitude, latitude]: number[]) => ({
             latitude,
@@ -136,10 +140,10 @@ export default function DetailsFarmScreen() {
           });
         }
       });
-  
+
       return polygons;
     };
-  
+
     // Tính toán trung tâm của một polygon
     const getPolygonCenter = (coordinates: { latitude: number; longitude: number }[]) => {
       let latSum = 0;
@@ -153,7 +157,7 @@ export default function DetailsFarmScreen() {
         longitude: lonSum / coordinates.length,
       };
     };
-  
+
     // Tính toán vùng bao cho tất cả polygons để đặt initialRegion
     const getMapRegion = (polygons: { coordinates: { latitude: number; longitude: number }[] }[]) => {
       if (!polygons.length) return {
@@ -162,12 +166,12 @@ export default function DetailsFarmScreen() {
         latitudeDelta: 0.1,
         longitudeDelta: 0.1,
       };
-  
+
       let minLat = Infinity;
       let maxLat = -Infinity;
       let minLon = Infinity;
       let maxLon = -Infinity;
-  
+
       polygons.forEach(polygon => {
         polygon.coordinates.forEach((point: { latitude: number; longitude: number }) => {
           minLat = Math.min(minLat, point.latitude);
@@ -176,12 +180,12 @@ export default function DetailsFarmScreen() {
           maxLon = Math.max(maxLon, point.longitude);
         });
       });
-  
+
       const latitude = (minLat + maxLat) / 2;
       const longitude = (minLon + maxLon) / 2;
       const latitudeDelta = (maxLat - minLat) * 1.2; // Thêm padding 20%
       const longitudeDelta = (maxLon - minLon) * 1.2; // Thêm padding 20%
-  
+
       return {
         latitude,
         longitude,
@@ -189,15 +193,15 @@ export default function DetailsFarmScreen() {
         longitudeDelta,
       };
     };
-  
+
     const polygons = parseCoordinates(mapData.geoemtry);
     const region = getMapRegion(polygons);
-  
+
     const height = dropdownStates[index].animation.interpolate({
       inputRange: [0, 1],
       outputRange: [0, 260],
     });
-  
+
     return (
       <Animated.View
         style={[
@@ -219,10 +223,10 @@ export default function DetailsFarmScreen() {
                 Alert.alert("Đã sao chép vào clipboard!");
               }}
             >
-              <Image
-                source={require("../../../assets/icon/copy.png")}
-                style={{ width: 15, height: 15 }}
-                resizeMode="contain"
+              <Ionicons
+                name="copy-outline"
+                size={15}
+                color="#333"
               />
             </TouchableOpacity>
           </View>
@@ -258,47 +262,52 @@ export default function DetailsFarmScreen() {
     );
   };
   //Hàm render ra thông tin GeoJson
-  const renderGeoJsonDropdownContent = (index: number) => {
+  const renderGeoJsonDropdownContent = (index: number, json: any) => {
+
     const height = dropdownStates[index].animation.interpolate({
       inputRange: [0, 1],
-      outputRange: [0, 50], // Độ cao tối thiểu và tối đa của menu
+      outputRange: [0, 200], // Tăng giá trị max lên cao hơn, auto mở rộng khi cần
     });
 
     return (
       <Animated.View
         style={[
           styles.dropdown,
-          { height },
+          { maxHeight: height, overflow: "hidden" }, // Dùng maxHeight để tự động điều chỉnh
           { borderBottomWidth: dropdownStates[2].isOpen ? 1 : 0 },
+          { borderBottomWidth: 0 }
         ]}
       >
-        <View style={styles.dropdown_2}>
-          <View style={{ marginTop: 10 }}>
-            <TouchableOpacity onPress={LinkGIS}>
-              <Text>https://arcg.is/15DXH123333</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={{ paddingBottom: 20 }}>
 
-          <View style={{ marginTop: 10 }}>
-            <TouchableOpacity
-              onPress={() => {
-                Clipboard.setStringAsync("https://arcg.is/15DXH12");
-                Alert.alert("Đã sao chép vào clipboard!");
-              }}
-            >
-              <Image
-                source={require("../../../assets/icon/copy.png")}
-                style={{ width: 15, height: 15 }}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          </View>
+          {json.geoemtry.map((item: any, index: any) => (
+            <View key={index} style={styles.dropdown_2}>
+              <View>
+                <Text numberOfLines={1} ellipsizeMode="tail">{item.json}</Text>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    Clipboard.setStringAsync(item.json);
+                    Alert.alert("Đã sao chép geoJson vào clipboard!");
+                  }}
+                >
+                  <Ionicons
+                    name="copy-outline"
+                    size={15}
+                    color="#333"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+
 
         </View>
-
       </Animated.View>
     );
   };
+
 
   const LinkGIS = () => {
     const url = "https://arcg.is/15DXH12";
@@ -312,13 +321,11 @@ export default function DetailsFarmScreen() {
       >
         <View
           style={{
-            paddingVertical: 10,
-            alignItems: "center",
-            justifyContent: "center",
+            height: 50,
             flexDirection: "row",
           }}
         >
-          <View style={{ width: "5%" }}>
+          <View style={{ width: "10%", justifyContent: 'center', alignItems: 'center' }}>
             <TouchableOpacity
               onPress={() => {
                 router.back();
@@ -361,7 +368,7 @@ export default function DetailsFarmScreen() {
         </View>
       ) : (
 
-        <ScrollView style={{ flex: 1, backgroundColor: "#f1f4f2" }}>
+        <ScrollView style={{ backgroundColor: "#f1f4f2" }}>
           {data && (
             <View style={{ paddingHorizontal: 10, alignItems: "center" }}>
               <View style={styles.button_slot}>
@@ -374,7 +381,7 @@ export default function DetailsFarmScreen() {
                     <Text style={styles.text_2}>{t('farm')}</Text>
                   </View>
                   <View style={{ width: "50%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>{data.farm.join(", ")}</Text>
+                    <Text style={styles.text_3}>{farmName}</Text>
                   </View>
                 </View>
                 <View style={styles.item}>
@@ -382,31 +389,33 @@ export default function DetailsFarmScreen() {
                     <Text style={styles.text_2}>{t('rubberReceivingDate')}</Text>
                   </View>
                   <View style={{ width: "35%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>{data.RubberReceivingDate}</Text>
+                    <Text style={styles.text_3}>{dateOfReceipt}</Text>
                   </View>
                 </View>
+                 <View style={styles.item}>
+                  <View style={{ width: "65%" }}>
+                    <Text style={styles.text_2}>{t('tappingDate')}</Text>
+                  </View>
+                  <View style={{ width: "35%", alignItems: "flex-end" }}>
+                    <Text style={styles.text_3}>{ngayCao}</Text>
+                  </View>
+                </View>
+                
                 <View style={styles.item}>
                   <View style={{ width: "65%" }}>
                     <Text style={styles.text_2}>{t('truckNumber')}</Text>
                   </View>
                   <View style={{ width: "35%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>60H-12345</Text>
+                    <Text style={styles.text_3}>{soXe} ({soChuyen})</Text>
                   </View>
                 </View>
-                <View style={styles.item}>
-                  <View style={{ width: "65%" }}>
-                    <Text style={styles.text_2}>{t('tripNumber')}</Text>
-                  </View>
-                  <View style={{ width: "35%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>1</Text>
-                  </View>
-                </View>
+                
                 <View style={styles.item}>
                   <View style={{ width: "45%" }}>
                     <Text style={styles.text_2}>{t('plantVariety')}</Text>
                   </View>
                   <View style={{ width: "55%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>{data.PlantVariety.join(", ")}</Text>
+                    <Text style={styles.text_3}></Text>
                   </View>
                 </View>
                 <View style={styles.item}>
@@ -414,17 +423,10 @@ export default function DetailsFarmScreen() {
                     <Text style={styles.text_2}>{t('rubberType')}</Text>
                   </View>
                   <View style={{ width: "35%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>{data.RubberType}</Text>
+                    <Text style={styles.text_3}>{loaiMu}</Text>
                   </View>
                 </View>
-                <View style={styles.item}>
-                  <View style={{ width: "65%" }}>
-                    <Text style={styles.text_2}>{t('tappingDate')}</Text>
-                  </View>
-                  <View style={{ width: "35%", alignItems: "flex-end" }}>
-                    <Text style={styles.text_3}>{data.TappingDate.join(", ")}</Text>
-                  </View>
-                </View>
+                {/*
                 <TouchableOpacity onPress={() => toggleDropdown(0)}>
                   <View
                     style={[
@@ -445,6 +447,7 @@ export default function DetailsFarmScreen() {
                     </View>
                   </View>
                 </TouchableOpacity>
+                
                 {renderSlotDropdownContent(0, data.TreeLot)}
 
                 <TouchableOpacity onPress={() => toggleDropdown(1)}>
@@ -486,7 +489,7 @@ export default function DetailsFarmScreen() {
                     </View>
                   </View>
                 </TouchableOpacity>
-                {renderGeoJsonDropdownContent(2)}
+                {renderGeoJsonDropdownContent(2, data.PlantationMap)} */}
               </View>
             </View>
           )}

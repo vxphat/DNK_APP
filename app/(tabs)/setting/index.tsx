@@ -184,7 +184,7 @@ const Setting = () => {
         <View>
           <TouchableOpacity
             onPress={() => {
-              router.push("/(tabs)/setting/language");
+              Linking.openURL('https://dongnaikratie.com/policy');
             }}
           >
             <View style={styles.item}>

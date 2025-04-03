@@ -15,10 +15,14 @@
       },
       "ios": {
         "bundleIdentifier": "com.dongnaikraite.dnkc"
-      }
+      },
+      "bundleIdentifier": "com.dongnaikraite.dnkc"
     },
     "android": {
       "package": "com.dongnaikraite.dnkc",
+      "config": {
+        "googleMapsApiKey": "AIzaSyAg5v_Z-LMR-YuhOR12hPK3cFoQQwO6bvM"
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon/app-icon.png",
         "backgroundColor": "#ffffff"
